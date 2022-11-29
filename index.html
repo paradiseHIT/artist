@@ -1,0 +1,292 @@
+<!--
+ * @Author: xing paradisehit@gmil.com
+ * @Date: 2022-11-26 15:44:34
+ * @LastEditors: xing paradisehit@gmil.com
+ * @LastEditTime: 2022-11-28 23:23:28
+ * @FilePath: /web/index.html
+ * @Description:生成图片
+-->
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Access-Control-Allow-Origin" content="*" />
+    <title>Bootstrap demo</title>
+    <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+    <div class="photo-gallery">
+        <div class="container">
+            <div class="intro">
+                <h2 class="text-center">Lightbox Gallery</h2>
+                <p class="text-center">Nunc luctus in metus eget fringilla. Aliquam sed justo ligula. Vestibulum nibh
+                    erat, pellentesque ut laoreet vitae. </p>
+            </div>
+
+            <div class="d-grid gap-2">
+                <div class="mb-3">
+                    <label for="" class="form-label">job id</label>
+                    <input type="text" class="form-control" name="" id="job_id" aria-describedby="helpId"
+                        placeholder="">
+                    <small id="helpId" class="form-text text-muted">please input job id</small><br>
+                    <input name="" id="queyy_btn" class="btn btn-primary" type="button" value="Query"><br>
+                    <label for="" class="form-label">Prompt</label>
+                    <input type="text" class="form-control" name="" id="prompt" aria-describedby="prompt desc"
+                        placeholder="">
+                    <small id="promptId" class="form-text text-muted">prompt_str</small><br>
+                    <input name="" id="generate_btn" class="btn btn-primary" type="button" value="Generate">
+                </div>
+            </div>
+            <!-- 
+            <div id="queue_div">
+                <p class="text-center" id="queue_text">当前排序</p>
+                <p class="text-center" id="queue_number">第2位</p>
+            </div><div class="row photos">
+                <div class="col-sm-6 col-md-4 col-lg-3 item">
+                    <a href="images/1.png" data-lightbox="photos">
+                        <img class="img-fluid" src="images/1.png">
+                    </a>
+                </div>
+            </div> -->
+        </div>
+</body>
+<script src="jquery/jquery-3.6.1.min.js"></script>
+<script src="bootstrap/js/bootstrap.min.js"></script>
+<script type="text/javascript">
+    /*
+     * click the query button to get the images
+     */
+
+    var query_interval_id
+    var query_times, queue_len, state, image_urls
+    var prompt_str = ""
+    var job_id_exists
+    $("#queyy_btn").click(function () {
+        var job_id = $("#job_id").val()
+        var reg = /^[1-9][0-9]+$/gi
+        var stop_inteval
+        if (!reg.test(job_id)) {
+            $("#job_id").val("please input job id")
+        } else {
+            //初始化
+            //ajax同步获取数据
+            async = false
+            if (query_interval_id != undefined) {
+                clearInterval(query_interval_id)
+            }
+            query_times = 0
+            queue_len = undefined
+
+            QueryAndUpdate(job_id, async)
+            //每隔x秒查一次
+            var x = 1
+            query_interval_id = setInterval("QueryAndUpdate(" + job_id + "," + async + ")", x * 1000);
+            console.log("queue_len in click:" + queue_len)
+
+        }
+    })
+
+    $("#generate_btn").click(function () {
+        var prompt_str = $("#prompt").val()
+        if (prompt_str == "" || prompt_str == undefined) {
+            $("#prompt").val("please input prompt")
+        } else {
+            //ajax同步获取数据
+            async = false
+            job_id = Generate(prompt_str, async)
+            //初始化
+            console.log(job_id)
+            if (query_interval_id != undefined) {
+                clearInterval(query_interval_id)
+            }
+            query_times = 0
+            queue_len = undefined
+
+            QueryAndUpdate(job_id, async)
+            //每隔x秒查一次
+            var x = 1
+            query_interval_id = setInterval("QueryAndUpdate(" + job_id + "," + async + ")", x * 1000);
+            console.log("queue_len in click:" + queue_len)
+        }
+    })
+
+    function EmptyDisplay() {
+        $("#queue_div").remove()
+        $(".row,.photos").remove()
+    }
+
+    function SetDivById(div_id, str) {
+        $("#" + div_id).val(str)
+    }
+
+    function DisplayJobNotExists(job_id) {
+        var queue_div = $("<div></div>")
+        queue_div.attr("id", "queue_div")
+
+        q_text = "<p>Job:<red>" + job_id + "</red> 不存在</p>"
+        queue_div.append($(q_text))
+        $(".container").append(queue_div)
+    }
+
+    function DisplayInProgress(n) {
+        var queue_div = $("<div></div>")
+        queue_div.attr("id", "queue_div")
+        var tmp = ""
+        for (var i = 0; i < n; i++) {
+            tmp += "."
+        }
+        queue_div.append($("<p>当前请求处理中" + tmp + "</p>"))
+        $(".container").append(queue_div)
+    }
+
+    function DisplayQueue(n) {
+        var queue_div = $("<div></div>")
+        queue_div.attr("id", "queue_div")
+        queue_div.append($("<p>当前请求 第<red>" + n + "</red>位</p>"))
+        $(".container").append(queue_div)
+    }
+
+    function DisplayPrompt(p_str) {
+        if (p_str != undefined) {
+            $("#prompt").val(p_str)
+        }
+    }
+
+    function DisplayJobid(j_id) {
+        if (j_id != undefined) {
+            $("#job_id").val(j_id)
+        }
+    }
+    function UpdateImages(image_urls) {
+        var row_photos = $("<div></div>")
+        row_photos.attr("class", "row photos")
+        $(".container").append(row_photos)
+        for (var i = 0; i < image_urls.length; i++) {
+            var div_elem = $("<div></div>")
+            div_elem.addClass("col-sm-6 col-md-4 col-lg-3 item")
+            var image_url = image_urls[i]
+            var a_elem = $("<a></a>")
+            a_elem.attr("href", image_url)
+            a_elem.attr("data-lightbox", "photos")
+            image_elem = $("<img>")
+            image_elem.attr("class", "img-fluid")
+            image_elem.attr("src", image_url)
+            a_elem.append(image_elem)
+            div_elem.append(a_elem)
+            row_photos.append(div_elem)
+        }
+        console.log(row_photos)
+    }
+
+    function Update(job_id) {
+        EmptyDisplay()
+        if (job_id_exists == false) {
+            DisplayJobNotExists(job_id)
+            clearInterval(query_interval_id)
+        }
+        if (queue_len != undefined) {
+            console.log("queue_len in UpdateQueueText:" + queue_len)
+            DisplayJobid(job_id)
+            DisplayPrompt(prompt_str)
+            if (state == 2 || state == 3) {
+                UpdateImages(image_urls)
+                clearInterval(query_interval_id)
+            } else if (state == 1) {
+                DisplayInProgress(query_times)
+            } else {
+                DisplayQueue(queue_len)
+            }
+        }
+    }
+
+    function QueryAndUpdate(job_id, async) {
+        Query(job_id, async)
+        query_times += 1
+        Update(job_id)
+    }
+
+    function GenerateAndUpdateText(prompt_str) {
+        Generate(prompt_str)
+        if (queue_len != undefined) {
+            UpdateQueueTextAndImage()
+            if (queue_len == 0 && state > 1) {
+                clearInterval(generate_interval_id)
+            }
+        }
+    }
+
+    function Query(job_id, async) {
+        $.ajax({
+            type: "post",//request id
+            //url:"data.txt",
+            url: "http://39.107.251.11:8082/query",
+            //url:"http://127.0.0.1/data.txt",
+            data: { "job_id": job_id }, //if no param needed, do not set
+            //请求成功时调用的函数
+            dataType: "json",
+            async: async,
+            crossDomain: true,
+            success: function (mydata) {
+                console.log(mydata)
+                var request_id = mydata["request_id"]
+                var code = mydata["code"]
+                queue_len = mydata["data"]["queue_len"]
+                state = mydata["data"]["result"]["state"] != undefined ? mydata["data"]["result"]["state"] : 1
+                prompt_str = mydata["data"]["result"]["prompt"]
+
+                job_id_exists = true
+                console.log("state:" + state)
+                console.log("queue_len:" + queue_len)
+                if (state == 2) {
+                    var images_str = mydata["data"]["result"]["Result"]
+                    var obj = JSON.parse(images_str)
+                    image_urls = obj["image_urls"]
+                    var grid_url = obj["grids_image"]
+                    console.log("-----------------")
+                    console.log($("#job_id").val())
+                    console.log("-----------------")
+                    console.log(image_urls)
+                }
+            }
+        }).fail(function (mydata) {
+            console.log("before " + job_id_exists)
+            job_id_exists = false
+            console.log("after " + job_id_exists)
+        })
+    }
+
+
+    function Generate(prompt_str, async) {
+        var job_id
+        $.ajax({
+            type: "post",//request id
+            url: "http://39.107.251.11:8082/process",
+            data: { "prompt": prompt_str }, //if no param needed, do not set
+            //请求成功时调用的函数
+            dataType: "json",
+            async : async,
+            crossDomain: true,
+            success: function (mydata) {
+                var request_id = mydata["request_id"]
+                var code = mydata["code"]
+                if (code != "OK") {
+                    alert(request_id + " failed")
+                    return
+                }
+                job_id = mydata["data"]["job_id"]
+                queue_len = mydata["data"]["queue_len"]
+            }
+        }).fail(function (mydata) {
+            console.log("failed")
+            console.log(mydata)
+        })
+        return job_id
+    }
+
+</script>
+
+
+</html>
