@@ -26,21 +26,90 @@
                     erat, pellentesque ut laoreet vitae. </p>
             </div>
 
-            <div class="d-grid gap-2">
-                <div class="mb-3">
-                    <label for="" class="form-label">job id</label>
-                    <input type="text" class="form-control" name="" id="job_id" aria-describedby="helpId"
-                        placeholder="">
-                    <small id="helpId" class="form-text text-muted">please input job id</small><br>
-                    <input name="" id="queyy_btn" class="btn btn-primary" type="button" value="Query"><br>
-                    <label for="" class="form-label">Prompt</label>
-                    <input type="text" class="form-control" name="" id="prompt" aria-describedby="prompt desc"
-                        placeholder="">
-                    <small id="promptId" class="form-text text-muted">prompt_str</small><br>
-                    <input name="" id="generate_btn" class="btn btn-primary" type="button" value="Generate">
+            <div class="row g-3 align-items-center">
+                <div class="input-group mb-3">
+                    <span class="input-group-text" id="job_id1">Job id</span>
+                    <input type="text" class="form-control" id="job_id" aria-describedby="job_id1" placeholder="eg.325">
+                    <input name="" id="query_btn" class="btn btn-primary" type="button" value="Query">
                 </div>
             </div>
-            <!-- 
+            <div class="row g-3 align-items-center">
+
+                <div class="input-group mb-3 ">
+                    <span class="input-group-text">Prompt</span>
+                    <textarea id="prompt" class="form-control" aria-label="Prompt" rows="3"
+                        placeholder="a photo of an astronaut riding a horse on mars"></textarea>
+                </div>
+            </div>
+            <div class="row g-3 align-items-center">
+
+                <div class="input-group  mb-3">
+                    <span class="input-group-text">Negative Prompt</span>
+                    <textarea id="negative_prompt" class="form-control" aria-label="NegPrompt" rows="2"
+                        placeholder=""></textarea>
+                </div>
+            </div>
+            <div class="row g-3 align-items-center">
+                <div class="input-group mb-3">
+                    <span class="input-group-text" id="width1">Width</span>
+                    <input type="text" class="form-control" id="width" aria-describedby="width1"
+                        placeholder="default 768"></input>
+
+                    <span class="input-group-text" id="height1">Height</span>
+                    <input type="text" class="form-control" id="height" aria-describedby="height1"
+                        placeholder="default 768"></input>
+
+                    <span class="input-group-text" id="random_seed1">Random seed</span>
+                    <input type="text" class="form-control" id="random_seed" aria-describedby="random_seed"
+                        placeholder="default 42"></input>
+
+
+                    <span class="input-group-text" id="n_iter1">Iterate</span>
+                    <input type="text" class="form-control" id="n_iter" aria-describedby="n_iter1"
+                        placeholder="default 3"></input>
+
+                </div>
+            </div>
+            <div class="row g-3 align-items-center">
+                <div class="input-group mb-3">
+                    <span for="guidance_scale1" class="input-group-text" style="width: 150px;">Guidance
+                        Scale</span>
+                    <span class="input-group-text" id="guidance_scale" style="width: 50px;">7.5</span>
+                    <div class="col-lg-5">
+                        <input type="range" class="form-range" min="0" max="30" step="0.5" value="7.5"
+                            id="guidance_scale_range" oninput="guidance_scale_change()"
+                            aria-describedby="guidance_scale1">
+                    </div>
+                </div>
+            </div>
+            <div class="row g-3 align-items-center">
+                <div class="input-group mb-3">
+                    <span class="input-group-text" id="steps1" style="width: 150px;">Steps</span>
+                    <span class="input-group-text" id="steps_value" style="width: 50px;">50</span>
+                    <div class="col-lg-5">
+                        <input type="range" class="form-range" min="10" max="200" step="1" value="50" id="steps"
+                            oninput="steps_change()" aria-describedby="steps1">
+                    </div>
+                </div>
+            </div>
+
+            <div class="row lg-3 align-items-center">
+                <div class="input-group mb-3">
+                    <span class="input-group-text" id="sampler1" style="width: 150px;">Sampler</span>
+                    <div class="col-s-2">
+                        <select class="form-control" style="width:auto;" id="sampler">
+                            <option value="ddim" selected>ddim</option>
+                            <option value="plms">plms</option>
+                            <option value="dmp">dmp</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="mb-3" style="text-align:center">
+                <input name="" id="generate_btn" class="btn btn-primary" type="button" value="Generate">
+            </div>
+        </div>
+        <!-- 
             <div id="queue_div">
                 <p class="text-center" id="queue_text">当前排序</p>
                 <p class="text-center" id="queue_number">第2位</p>
@@ -51,7 +120,7 @@
                     </a>
                 </div>
             </div> -->
-        </div>
+    </div>
 </body>
 <script src="jquery/jquery-3.6.1.min.js"></script>
 <script src="bootstrap/js/bootstrap.min.js"></script>
@@ -63,9 +132,19 @@
     var query_interval_id
     var query_times, queue_len, state, image_urls
     var prompt_str = ""
+    var negative_prompt = ""
+    var steps = 50
+    var width = 768
+    var height = 768
+    var guidance_scale = 7.5
+    var random_seed = 42
+    var sampler = ""
+    var n_iter = 3
     var job_id_exists
-    $("#queyy_btn").click(function () {
-        var job_id = $("#job_id").val()
+    var job_internal_error = false
+    var job_id
+    $("#query_btn").click(function () {
+        job_id = $("#job_id").val()
         var reg = /^[1-9][0-9]+$/gi
         var stop_inteval
         if (!reg.test(job_id)) {
@@ -79,43 +158,74 @@
             }
             query_times = 0
             queue_len = undefined
+            job_internal_error = false
 
-            QueryAndUpdate(job_id, async)
+            QueryOnce(job_id)
             //每隔x秒查一次
-            var x = 1
-            query_interval_id = setInterval("QueryAndUpdate(" + job_id + "," + async + ")", x * 1000);
+            var x = 1000
+            query_interval_id = setInterval("QueryAndUpdate(" + job_id + "," + async + ")", x);
             console.log("queue_len in click:" + queue_len)
 
         }
     })
 
     $("#generate_btn").click(function () {
-        var prompt_str = $("#prompt").val()
-        if (prompt_str == "" || prompt_str == undefined) {
-            $("#prompt").val("please input prompt")
-        } else {
-            //ajax同步获取数据
-            async = false
-            job_id = Generate(prompt_str, async)
-            //初始化
-            console.log(job_id)
+        if ($("#width").val() == "" || $("#width").val() == 0) {
+            width = 768
+            $("#width").val(width)
+        }
+        if ($("#height").val() == "" || $("#height").val() == 0) {
+            height = 768
+            $("#height").val(height)
+        }
+        if ($("#steps").val() == "" || $("#steps").val() == 0) {
+            steps = 50
+            $("#steps").val(steps)
+        }
+        if ($("#n_iter").val() == "" || $("#n_iter").val() == 0) {
+            n_iter = 3
+            $("#n_iter").val(n_iter)
+        }
+        if ($("#guidance_scale").val() == "" || $("#guidance_scale").val() == 0) {
+            guidance_scale = 7.5
+            $("#guidance_scale").val(guidance_scale)
+        }
+        if ($("#random_seed").val() == "" || $("#random_seed").val() == 0) {
+            random_seed = 42
+            $("#random_seed").val(random_seed)
+        }
+        if ($("#sampler").val() == "") {
+            $("#sampler").val("ddim")
+        }
+        if ($("#prompt").val() == "") {
+            $("#prompt").val("a photo of an astronaut riding a horse on mars")
+        }
+        //ajax同步获取数据
+        async = false
+        job_id = Generate(async)
+        //初始化
+        console.log(job_id)
+        if (job_id != undefined) {
             if (query_interval_id != undefined) {
                 clearInterval(query_interval_id)
             }
             query_times = 0
             queue_len = undefined
 
-            QueryAndUpdate(job_id, async)
+            QueryAndUpdate(async)
             //每隔x秒查一次
-            var x = 1
-            query_interval_id = setInterval("QueryAndUpdate(" + job_id + "," + async + ")", x * 1000);
+            var x = 1000
+            query_interval_id = setInterval("QueryAndUpdate(" + job_id + "," + async + ")", x);
             console.log("queue_len in click:" + queue_len)
+        } else {
+            DisplayError()
         }
     })
 
     function EmptyDisplay() {
         $("#queue_div").remove()
-        $(".row,.photos").remove()
+        $("#row_div").remove()
+        //$(".row,.photos").remove()
     }
 
     function SetDivById(div_id, str) {
@@ -127,6 +237,14 @@
         queue_div.attr("id", "queue_div")
 
         q_text = "<p>Job:<red>" + job_id + "</red> 不存在</p>"
+        queue_div.append($(q_text))
+        $(".container").append(queue_div)
+    }
+    function DisplayError() {
+        var queue_div = $("<div></div>")
+        queue_div.attr("id", "queue_div")
+
+        q_text = "<p>内部错误</p>"
         queue_div.append($(q_text))
         $(".container").append(queue_div)
     }
@@ -160,13 +278,30 @@
             $("#job_id").val(j_id)
         }
     }
+    function DisplayQueryInfo() {
+        $("#job_id").val(job_id)
+        $("#prompt").val(prompt_str)
+        $("#width").val(width)
+        $("#height").val(height)
+        $("#steps").val(steps)
+        document.getElementById('steps_value').innerHTML = steps;
+        // $("#steps_value").val(steps)
+        // $("#guidance_scale").val(guidance_scale)
+        document.getElementById('guidance_scale').innerHTML = guidance_scale;
+        $("#guidance_scale_range").val(guidance_scale)
+        $("#random_seed").val(random_seed)
+        $("#negative_prompt").val(negative_prompt)
+        $("#n_iter").val(n_iter)
+        // $("#sampler").val(sampler)
+        document.getElementById('sampler').value = sampler;
+    }
     function UpdateImages(image_urls) {
-        var row_photos = $("<div></div>")
+        var row_photos = $("<div id='row_div'></div>")
         row_photos.attr("class", "row photos")
         $(".container").append(row_photos)
         for (var i = 0; i < image_urls.length; i++) {
             var div_elem = $("<div></div>")
-            div_elem.addClass("col-sm-6 col-md-4 col-lg-3 item")
+            div_elem.addClass("col-sm-6 col-md-3 col-lg-3 item")
             var image_url = image_urls[i]
             var a_elem = $("<a></a>")
             a_elem.attr("href", image_url)
@@ -181,20 +316,18 @@
         console.log(row_photos)
     }
 
-    function Update(job_id) {
+    function Update() {
         EmptyDisplay()
-        if (job_id_exists == false) {
+        DisplayQueryInfo()
+        if (job_internal_error) {
+            clearInterval(query_interval_id)
+        } else if (job_id_exists == false) {
             DisplayJobNotExists(job_id)
             clearInterval(query_interval_id)
-        }
-        if (queue_len != undefined) {
-            console.log("queue_len in UpdateQueueText:" + queue_len)
-            console.log("prompt_str in UpdateQueueText:" + prompt_str)
-            DisplayJobid(job_id)
-            DisplayPrompt(prompt_str)
+        } else if (queue_len != undefined) {
             if (state == 2 || state == 3) {
-                UpdateImages(image_urls)
                 clearInterval(query_interval_id)
+                UpdateImages(image_urls)
             } else if (state == 1) {
                 DisplayInProgress(query_times)
             } else {
@@ -203,28 +336,65 @@
         }
     }
 
-    function QueryAndUpdate(job_id, async) {
+    function QueryAndUpdate(async) {
         Query(job_id, async)
         query_times += 1
-        Update(job_id)
+        Update()
     }
 
-    function GenerateAndUpdateText(prompt_str) {
-        Generate(prompt_str)
-        if (queue_len != undefined) {
-            UpdateQueueTextAndImage()
-            if (queue_len == 0 && state > 1) {
-                clearInterval(generate_interval_id)
+    function QueryOnce(job_id) {
+        var data = { "job_id": parseInt(job_id) }
+        fetch("http://39.107.251.11:8082/query", {
+            method: "POST",
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        }).then(response => {
+            return response.json()
+        }).then(mydata => {
+            try {
+                console.log("Request complete! response:", mydata);
+                var request_id = mydata["request_id"]
+                var code = mydata["code"]
+                console.log("request_id:" + mydata[request_id])
+                queue_len = mydata["data"]["queue_len"]
+                state = mydata["data"]["result"]["state"] != undefined ? mydata["data"]["result"]["state"] : 1
+                prompt_str = mydata["data"]["result"]["prompt"]
+                width = mydata["data"]["result"]["width"]
+                height = mydata["data"]["result"]["height"]
+                steps = mydata["data"]["result"]["steps"]
+                guidance_scale = mydata["data"]["result"]["guidance_scale"]
+                random_seed = mydata["data"]["result"]["random_seed"]
+                negative_prompt = mydata["data"]["result"]["negative_prompt"]
+
+                job_id_exists = true
+                console.log("state:" + state)
+                console.log("queue_len:" + queue_len)
+                if (state == 2) {
+                    var images_str = mydata["data"]["result"]["Result"]
+                    var obj
+                    obj = JSON.parse(images_str)
+                    image_urls = obj["image_urls"]
+                    var grid_url = obj["grids_image"]
+                    console.log("-----------------")
+                    console.log("image_urls")
+                    console.log(image_urls)
+                    console.log("-----------------")
+                    console.log("grid_url")
+                    console.log(grid_url)
+                    console.log("-----------------")
+                }
+            } catch (error) {
+                job_internal_error = true
             }
-        }
+            Update()
+        });
+
     }
 
     function Query(job_id, async) {
         $.ajax({
             type: "post",//request id
-            //url:"data.txt",
             url: "http://39.107.251.11:8082/query",
-            //url:"http://127.0.0.1/data.txt",
             data: { "job_id": job_id }, //if no param needed, do not set
             //请求成功时调用的函数
             dataType: "json",
@@ -232,44 +402,73 @@
             crossDomain: true,
             success: function (mydata) {
                 console.log(mydata)
-                var request_id = mydata["request_id"]
-                var code = mydata["code"]
-                queue_len = mydata["data"]["queue_len"]
-                state = mydata["data"]["result"]["state"] != undefined ? mydata["data"]["result"]["state"] : 1
-                prompt_str = mydata["data"]["result"]["prompt"]
+                try {
+                    var request_id = mydata["request_id"]
+                    var code = mydata["code"]
+                    queue_len = mydata["data"]["queue_len"]
+                    state = mydata["data"]["result"]["state"] != undefined ? mydata["data"]["result"]["state"] : 1
+                    prompt_str = mydata["data"]["result"]["prompt"]
+                    width = mydata["data"]["result"]["width"]
+                    height = mydata["data"]["result"]["height"]
+                    steps = mydata["data"]["result"]["steps"]
+                    guidance_scale = mydata["data"]["result"]["guidance_scale"]
+                    random_seed = mydata["data"]["result"]["random_seed"]
+                    negative_prompt = mydata["data"]["result"]["negative_prompt"]
+                    n_iter = mydata["data"]["result"]["n_iter"]
+                    sampler = mydata["data"]["result"]["sampler"]
 
-                job_id_exists = true
-                console.log("state:" + state)
-                console.log("queue_len:" + queue_len)
-                if (state == 2) {
-                    var images_str = mydata["data"]["result"]["Result"]
-                    var obj = JSON.parse(images_str)
-                    image_urls = obj["image_urls"]
-                    var grid_url = obj["grids_image"]
-                    console.log("-----------------")
-                    console.log($("#job_id").val())
-                    console.log("-----------------")
-                    console.log(image_urls)
+                    job_id_exists = true
+                    console.log("queue_len:" + queue_len)
+                    if (state == 2) {
+                        var images_str = mydata["data"]["result"]["Result"]
+                        var obj
+                        obj = JSON.parse(images_str)
+                        image_urls = obj["image_urls"]
+                        var grid_url = obj["grids_image"]
+                        console.log("-----------------")
+                        console.log("image_urls")
+                        console.log(image_urls)
+                        console.log("-----------------")
+                        console.log("grid_url")
+                        console.log(grid_url)
+                        console.log("-----------------")
+                    }
+
+                } catch (error) {
+                    job_internal_error = true
+                    console.log(error)
                 }
             }
         }).fail(function (mydata) {
-            console.log("before " + job_id_exists)
             job_id_exists = false
-            console.log("after " + job_id_exists)
         })
     }
 
 
-    function Generate(prompt_str, async) {
+    function Generate(async) {
         var job_id
+        var post_data = {
+            "width": $("#width").val(),
+            "height": $("#height").val(),
+            "random_seed": $("#random_seed").val(),
+            "negative_prompt": $("#negative_prompt").val(),
+            "prompt": $("#prompt").val(),
+            "guidance_scale": $("#guidance_scale").val(),
+            "steps": $("#steps").val(),
+            "n_iter": $("#n_iter").val(),
+            "sampler": $("#sampler").val()
+        }
+        console.log("post_data in Generate:" + JSON.stringify(post_data))
+        console.log("post_data in Generate:" + typeof (post_data))
         $.ajax({
             type: "post",//request id
             url: "http://39.107.251.11:8082/process",
-            data: { "prompt": prompt_str }, //if no param needed, do not set
-            //请求成功时调用的函数
+            data: post_data,
+            //if no param needed, do not set
             dataType: "json",
-            async : async,
+            async: async,
             crossDomain: true,
+            //请求成功时调用的函数
             success: function (mydata) {
                 var request_id = mydata["request_id"]
                 var code = mydata["code"]
@@ -285,6 +484,15 @@
             console.log(mydata)
         })
         return job_id
+    }
+
+    function steps_change() {
+        var value = $("#steps").val();
+        document.getElementById('steps_value').innerHTML = value;
+    }
+    function guidance_scale_change() {
+        var value = $("#guidance_scale_range").val();
+        document.getElementById('guidance_scale').innerHTML = value;
     }
 
 </script>
