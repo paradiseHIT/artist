@@ -11,549 +11,160 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1 user-scalable=no">
     <meta http-equiv="Access-Control-Allow-Origin" content="*" />
     <title>Bootstrap demo</title>
     <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link href="css/sd.css" rel="stylesheet">
+    <style>
+    </style>
 </head>
 
 <body>
     <div class="photo-gallery">
         <div class="container" id="main_container">
             <div class="intro">
-                <h2 class="text-center">Lightbox Gallery</h2>
-                <p class="text-center">Nunc luctus in metus eget fringilla. Aliquam sed justo ligula. Vestibulum nibh
-                    erat, pellentesque ut laoreet vitae. </p>
+                <h2 class="text-center">Prompts Database</h2>
             </div>
-
             <div class="row g-3 align-items-center">
-                <div class="input-group mb-3">
-                    <span class="input-group-text" id="job_id1">Job id</span>
-                    <input type="text" class="form-control" id="job_id" aria-describedby="job_id1" placeholder="eg.325">
-                    <input name="" id="query_btn" class="btn btn-primary" type="button" value="Query">
+                <div class="col-sm-6 col-center-block mb-3">
+                    <input type="text" class="form-control " id="search_words" aria-describedby="Search"
+                        placeholder="Search AI images">
                 </div>
             </div>
             <div class="row g-3 align-items-center">
 
-                <div class="input-group mb-3 ">
-                    <span class="input-group-text">Prompt</span>
-                    <textarea id="prompt" class="form-control" aria-label="Prompt" rows="3"
-                        placeholder="a photo of an astronaut riding a horse on mars"></textarea>
-                </div>
-            </div>
-            <div class="row g-3 align-items-center">
-
-                <div class="input-group  mb-3">
-                    <span class="input-group-text">Negative Prompt</span>
-                    <textarea id="negative_prompt" class="form-control" aria-label="NegPrompt" rows="2"
-                        placeholder=""></textarea>
-                </div>
-            </div>
-            <div class="row g-3 align-items-center">
-                <div class="input-group mb-3">
-                    <span class="input-group-text" id="width1">Width</span>
-                    <input type="text" class="form-control" id="width" aria-describedby="width1"
-                        placeholder="default 768"></input>
-
-                    <span class="input-group-text" id="height1">Height</span>
-                    <input type="text" class="form-control" id="height" aria-describedby="height1"
-                        placeholder="default 768"></input>
-
-                    <span class="input-group-text" id="random_seed1">Random seed</span>
-                    <input type="text" class="form-control" id="random_seed" aria-describedby="random_seed"
-                        placeholder="default 42"></input>
-
-
-                    <span class="input-group-text" id="n_samples1">Samples</span>
-                    <input type="text" class="form-control" id="n_samples" aria-describedby="n_samples1"
-                        placeholder="default 3"></input>
-
-                </div>
-            </div>
-            <div class="row g-3 align-items-center">
-                <div class="input-group mb-3">
-                    <span for="guidance_scale1" class="input-group-text" style="width: 150px;">Guidance
-                        Scale</span>
-                    <span class="input-group-text" id="guidance_scale_show" style="width: 50px;">7.5</span>
-                    <div class="col-lg-5">
-                        <input type="range" class="form-range" min="0" max="30" step="0.5" value="7.5"
-                            id="guidance_scale" oninput="GuidanceScaleChange()"
-                            aria-describedby="guidance_scale1">
-                    </div>
-                </div>
-            </div>
-            <div class="row g-3 align-items-center">
-                <div class="input-group mb-3">
-                    <span class="input-group-text" id="steps1" style="width: 150px;">Steps</span>
-                    <span class="input-group-text" id="steps_show" style="width: 50px;">50</span>
-                    <div class="col-lg-5">
-                        <input type="range" class="form-range" min="10" max="200" step="1" value="50" id="steps"
-                            oninput="StepsChange()" aria-describedby="steps1">
-                    </div>
+                <div class="col-sm-6 col-center-block mb-3">
+                    <input name="" id="search_btn" class="btn btn-primary col-center-block" type="button"
+                        value="Search">
                 </div>
             </div>
 
-            <div class="row lg-3 align-items-center">
-                <div class="input-group mb-3">
-                    <span class="input-group-text" id="sampler1" style="width: 150px;">Sampler</span>
-                    <div class="col-s-2">
-                        <select class="form-control" style="width:auto;" id="sampler">
-                            <option value="ddim" selected>ddim</option>
-                            <option value="plms">plms</option>
-                            <option value="dmp">dmp</option>
-                            <option value="euler_a">euler_a</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-            <div class="mb-3" style="text-align:center">
-                <input name="" id="generate_btn" class="btn btn-primary" type="button" value="Generate">
-            </div>
             <div id="queue_div">
             </div>
             <div id="row_div" class="row photos">
             </div>
         </div>
-    </div>
+        <!-- 模态框（Modal） -->
+        <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content  modal_dark">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <!-- <div class="modal-header modal_dark">
+                                <button type="button" class="btn btn-primary" id="modal-close"
+                                    data-dismiss="modal">&times;
+                                </button>
+                            </div> -->
+                            <div class="row mb-5">
+
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="row prompt_bg mb-3">
+                                        <div id="modal-prompt">
+                                            prompt
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="modal_text">
+                                                <div class="btn btn-secondary" id="modal_copy">
+                                                    <span class="bi bi-clipboard2"></span>
+                                                    copy prompt
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <div class="row ml-3">
+                                        <div class="col">
+                                            <div class="btn btn-secondary col-sm-12" id="modal-editor"><span
+                                                    class="bi bi-pencil-square"></span>Open in editor</div>
+                                        </div>
+                                    </div>
+                                    <div class="row" id="modal-parameters">
+                                        <div class="row mb-1">
+                                            <div class="row modal-div-block-title">
+                                                seed
+                                            </div>
+                                            <div class="row modal-div-block-text">
+                                                12312313
+                                            </div>
+                                        </div>
+                                        <div class="row mb-1">
+                                            <div class="row modal-div-block-title">
+                                                Guidance scale
+                                            </div>
+                                            <div class="row modal-div-block-text">
+                                                7
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="row">
+                                        <div class="modal-image">
+                                            modal-image
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="row modal_text">
+                                    <div class="btn btn-secondary col-sm-4  mx-auto" id="modal-close">
+                                        <span class="bi bi-x-circle"></span>
+                                        Close
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- </div>
+                        <div class="row">
+                            <div class="modal-footer">
+                            </div>
+                        </div> -->
+                        </div>
+                    </div><!-- /.modal-content -->
+                </div><!-- /.modal -->
+            </div>
+        </div>
 </body>
+
 <script src="jquery/jquery-3.6.1.min.js"></script>
 <script src="bootstrap/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="js/sd.js"></script>
 <script type="text/javascript">
-    /*
-     * click the query button to get the images
-     */
-    const JOB_NOT_EXISTS_ERROR = "JOB_NOT_EXISTS_ERROR"
-    const INTERNAL_ERROR = "INTERNAL_ERROR"
-    const CODE_OK = "OK"
 
-    const PAGE_SIZE = 4
-    var page_num = 1
-
-    var query_interval_id
-    var query_times, queue_len, state, image_urls
-    var prompt_str = undefined
-    var negative_prompt = undefined
-    var steps = 50
-    var width = undefined
-    var height = undefined
-    var guidance_scale = 7.5
-    var random_seed = undefined
-    var sampler = "ddim"
-    var n_samples = undefined
-    var job_not_exists = false
-    var job_internal_error = false
-    var job_id
-    var image_details = []
-    
-    $("#query_btn").click(function () {
-        job_id = $("#job_id").val()
-        var reg = /^[0-9]+$/gi
-        var stop_inteval
-        if (job_id == 0 || !reg.test(job_id)) {
-            $("#job_id").val("please input job id")
-        } else {
-            //初始化
-            //ajax同步获取数据
-            Init()
-            async = false
-            if (query_interval_id != undefined) {
-                clearInterval(query_interval_id)
-            }
-
-            QueryOnce(job_id)
-            //每隔x秒查一次
-            var x = 1000
-            query_interval_id = setInterval("QueryAndUpdate("+job_id+")", x);
-
-        }
-    })
-
-    $("#generate_btn").click(function () {
-        if($("#prompt").val() == "") {
-            alert("please input prompt")
-            $("#prompt").focus()
-        } else {
-            GenerateInitilize()
-            //ajax同步获取数据
-            async = false
-            job_id = Generate(async)
-            //初始化
-            if (job_id != undefined) {
-                if (query_interval_id != undefined) {
-                    clearInterval(query_interval_id)
-                }
-
-                QueryAndUpdate(job_id)
-                //每隔x秒查一次
-                var x = 1000
-                query_interval_id = setInterval("QueryAndUpdate("+job_id+")", x);
-            } else {
-                DisplayError()
-            }
-        }
-    })
-
-    function Init() {
-        query_times = 0
-        queue_len = undefined
-        image_urls = []
-        prompt_str = undefined
-        negative_prompt = undefined
-        steps = 50
-        width = undefined
-        height = undefined
-        guidance_scale = 7.5
-        random_seed = undefined
-        sampler = "ddim"
-        n_samples = undefined
-        job_not_exists = false
-        job_internal_error = false
-
-        image_details = []
-
-    }
-
-    function GenerateInitilize(){
-        Init()
-        if ($("#width").val() == "" || $("#width").val() == 0) {
-            width = 768
-            $("#width").val(width)
-        }
-        if ($("#height").val() == "" || $("#height").val() == 0) {
-            height = 768
-            $("#height").val(height)
-        }
-        if ($("#steps").val() == "" || $("#steps").val() == 0) {
-            steps = 50
-            $("#steps").val(steps)
-        }
-        if ($("#n_samples").val() == "" || $("#n_samples").val() == 0) {
-            n_samples = 3
-            $("#n_samples").val(n_samples)
-        }
-        if ($("#guidance_scale").val() == "" || $("#guidance_scale").val() == 0) {
-            guidance_scale = 7.5
-            $("#guidance_scale").val(guidance_scale)
-        }
-        if ($("#random_seed").val() == "" || $("#random_seed").val() == 0) {
-            random_seed = 42
-            $("#random_seed").val(random_seed)
-        }
-        if ($("#sampler").val() == "") {
-            $("#sampler").val("ddim")
-        }
-    }
-
-    function EmptyDisplay() {
-        $("#queue_div").empty()
-        $("#row_div").empty()
-    }
-
-    function SetDivById(div_id, str) {
-        $("#" + div_id).val(str)
-    }
-
-    function DisplayJobNotExists(job_id) {
-        var queue_div = $("#queue_div")
-
-        q_text = "<p>Job:<red>" + job_id + "</red> 不存在</p>"
-        queue_div.append($(q_text))
-        $(".container").append(queue_div)
-    }
-    function DisplayError() {
-        var queue_div = $("<div></div>")
-        queue_div.attr("id", "queue_div")
-
-        q_text = "<p>内部错误</p>"
-        queue_div.append($(q_text))
-        $(".container").append(queue_div)
-    }
-
-    function DisplayInProgress(n) {
-        var queue_div = $("#queue_div")
-        queue_div.empty()
-        var tmp = ""
-        for (var i = 0; i < n; i++) {
-            tmp += "."
-        }
-        queue_div.append($("<p>当前请求处理中" + tmp + "</p>"))
-        $(".container").append(queue_div)
-    }
-
-    function DisplayQueue(n) {
-        var queue_div = $("#queue_div")
-        queue_div.empty()
-        queue_div.append($("<p>当前请求 第<red>" + n + "</red>位</p>"))
-        $(".container").append(queue_div)
-    }
-
-    function DisplayPrompt(p_str) {
-        if (p_str != undefined) {
-            $("#prompt").val(p_str)
-        }
-    }
-
-    function DisplayJobid(j_id) {
-        if (j_id != undefined) {
-            $("#job_id").val(j_id)
-        }
-    }
-    function DisplayQueryInfo() {
-        $("#job_id").val(job_id)
-        $("#prompt").val(prompt_str)
-        $("#width").val(width)
-        $("#height").val(height)
-        $("#steps").val(steps)
-        document.getElementById('steps_show').innerHTML = steps;
-        document.getElementById('guidance_scale_show').innerHTML = guidance_scale;
-        $("#guidance_scale").val(guidance_scale)
-        $("#random_seed").val(random_seed)
-        $("#negative_prompt").val(negative_prompt)
-        $("#n_samples").val(n_samples)
-        document.getElementById('sampler').value = sampler;
-    }
-    function UpdateImages(image_urls) {
-        var row_photos = $("#row_div")
-        for (var i = 0; i < image_urls.length; i++) {
-            var div_elem = $("<div></div>")
-            div_elem.addClass("col-sm-6 col-md-3 col-lg-3 item")
-            var image_url = image_urls[i]
-            var a_elem = $("<a></a>")
-            a_elem.attr("href", image_url)
-            a_elem.attr("data-lightbox", "photos")
-            image_elem = $("<img>")
-            image_elem.attr("class", "img-fluid")
-            image_elem.attr("src", image_url)
-            a_elem.append(image_elem)
-            div_elem.append(a_elem)
-            row_photos.append(div_elem)
-        }
-    }
-
-    function Update() {
-        EmptyDisplay()
-        DisplayQueryInfo()
-        if (job_internal_error) {
-            console.log("job_internal_error")
-            clearInterval(query_interval_id)
-        } else if (job_not_exists == true) {
-            console.log("job_not_exists")
-            DisplayJobNotExists(job_id)
-            clearInterval(query_interval_id)
-        } else if (queue_len != undefined) {
-            if (state == 2 || state == 3) {
-                clearInterval(query_interval_id)
-                UpdateImages(image_urls)
-            } else if (state == 1) {
-                DisplayInProgress(query_times)
-            } else {
-                DisplayQueue(queue_len)
-            }
-        }
-    }
-
-    function QueryAndUpdate(job_id) {
-        QueryOnce(job_id)
-        query_times += 1
-        Update()
-    }
-
-    function ParseResult(mydata) {
-        try {
-            console.log("Request complete! response:", mydata);
-            var request_id = mydata["request_id"]
-            var code = mydata["code"]
-            if (code == CODE_OK) {
-                queue_len = mydata["data"]["queue_len"]
-                state = mydata["data"]["result"]["state"] != undefined ? mydata["data"]["result"]["state"] : 1
-                prompt_str = mydata["data"]["result"]["prompt"]
-                width = mydata["data"]["result"]["width"]
-                height = mydata["data"]["result"]["height"]
-                steps = mydata["data"]["result"]["steps"]
-                guidance_scale = mydata["data"]["result"]["guidance_scale"]
-                random_seed = mydata["data"]["result"]["random_seed"]
-                negative_prompt = mydata["data"]["result"]["negative_prompt"]
-                sampler = mydata["data"]["result"]["sampler"]
-                n_samples = mydata["data"]["result"]["n_samples"]
-                job_id = mydata["data"]["result"]['job_id']
-                job_not_exists = false
-                if (state == 2) {
-                    var images_str = mydata["data"]["result"]["result"]
-                    var obj
-                    obj = JSON.parse(images_str)
-                    image_urls = obj["image_urls"]
-                    var grid_url = obj["grids_image"]
-                }
-            } else if (code == JOB_NOT_EXISTS_ERROR) {
-                console.log(JOB_NOT_EXISTS_ERROR + ":" + job_id)
-                job_not_exists = true
-            }
-        } catch (error) {
-            job_internal_error = true
-            console.log("job_internal_error")
-            console.log(error)
-        }
-    }
-
-    function QueryOnce(job_id) {
-        var data = { "job_id": parseInt(job_id) }
-        console.log("post data in QueryOnce is " + JSON.stringify(data))
-        fetch("http://39.107.251.11:8082/query", {
-            method: "POST",
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
-        }).then(response => {
-            return response.json()
-        }).then(mydata => {
-            ParseResult(mydata)
-            Update()
-        });
-
-    }
-
-    function Query(job_id, async) {
-        $.ajax({
-            type: "post",//request id
-            url: "http://39.107.251.11:8082/query",
-            data: { "job_id": job_id }, //if no param needed, do not set
-            //请求成功时调用的函数
-            dataType: "json",
-            async: async,
-            crossDomain: true,
-            success: ParseResult(mydata)
-        }).fail(function (mydata) {
-            job_internal_error = false
-        })
-    }
-
-
-    function Generate(async) {
-        var job_id
-        var post_data = {
-            "width": $("#width").val(),
-            "height": $("#height").val(),
-            "random_seed": $("#random_seed").val(),
-            "negative_prompt": $("#negative_prompt").val(),
-            "prompt": $("#prompt").val(),
-            "guidance_scale": $("#guidance_scale").val(),
-            "steps": $("#steps").val(),
-            "n_samples": $("#n_samples").val(),
-            "sampler": $("#sampler").val()
-        }
-        console.log("post_data in Generate:" + JSON.stringify(post_data))
-        $.ajax({
-            type: "post",//request id
-            url: "http://39.107.251.11:8082/process",
-            data: post_data,
-            //if no param needed, do not set
-            dataType: "json",
-            async: async,
-            crossDomain: true,
-            //请求成功时调用的函数
-            success: function (mydata) {
-                var request_id = mydata["request_id"]
-                var code = mydata["code"]
-                if (code != "OK") {
-                    alert(request_id + " failed")
-                    return
-                }
-                job_id = mydata["data"]["job_id"]
-                queue_len = mydata["data"]["queue_len"]
-            }
-        }).fail(function (mydata) {
-            console.log("failed")
-            console.log(mydata)
-        })
-        return job_id
-    }
-
-    function StepsChange() {
-        var value = $("#steps").val();
-        document.getElementById('steps_show').innerHTML = value;
-    }
-    function GuidanceScaleChange() {
-        var value = $("#guidance_scale").val();
-        document.getElementById('guidance_scale_show').innerHTML = value;
-    }
-
-    $(document).ready(function() {
+    $(document).ready(function () {
         image_details = []
         start_page_num = 1
-        for (page_num=start_page_num; page_num<start_page_num+5 ;page_num++) {
+        for (page_num = start_page_num; page_num < start_page_num + 3; page_num++) {
             return_num = LoadOnePageImages(page_num)
-            console.log("return_num="+return_num)
-            if(return_num == undefined || return_num < PAGE_SIZE) {
+            console.log("return_num=" + return_num)
+            console.log("page_num=" + page_num)
+            if (return_num == undefined || return_num < PAGE_SIZE) {
                 break
             }
         }
-        console.log("page_num1=" + page_num)
     })
-    $(window).scroll(function() {
+    $(window).scroll(function () {
         var scrollTop = $(this).scrollTop(); //滚动条距离顶部的高度
         var scrollHeight = $(document).height(); //当前页面的总高度
         var clientHeight = $(this).height(); //当前可视的页面高度
-        if (scrollTop + clientHeight >= scrollHeight - 50) {
-            LoadOnePageImages(page_num)
-            page_num++
-            console.log("page_num2=" + page_num)
-            console.log("scrollTop + clientHeight = " + (scrollTop + clientHeight))
-            console.log("scrollHeight - 50 = " + (scrollHeight - 50))
-        }
-  }) 
-    document.getElementById("main_container").onscroll = function() {
-        LoadOnePageImages(page_num);
-        page_num++;
-        console.log("main_container")
-        console.log("page_num=" +page_num)
-    };
-
-    function LoadOnePageImages(page_num) {
-        url = "http://39.107.251.11:8082/listImages?page_size="+PAGE_SIZE+"&page_num="+page_num
-        console.log(url)
-        var return_num = fetch(url, {
-            method: "GET",
-            headers: { 'Content-Type': 'application/json' },
-        }).then(response => {
-            return response.json()
-        }).then(mydata => {
-            try {
-                console.log("Request complete! response:", mydata);
-                image_details = mydata["data"]["result"]
-                ShowImages(image_details)
-                return image_details.length
-            } catch (error) {
-                job_internal_error = true
+        if (scrollTop + clientHeight >= scrollHeight - 30) {
+            if (is_search) {
+                Search(search_words, page_num)
+            } else {
+                LoadOnePageImages(page_num)
             }
-        });
-        return return_num
-
-    }
-    
-    function ShowImages(image_details) {
-        var row_photos = $("#row_div")
-        image_urls = []
-        for (var i = 0; i < image_details.length; i++) {
-            image_urls.push(image_details[i]["image_url"])
+            page_num++
         }
-        
-        for (var i = 0; i < image_urls.length; i++) {
-            var div_elem = $("<div></div>")
-            div_elem.addClass("col-sm-6 col-md-3 col-lg-3 item")
-            var image_url = image_urls[i]
-            var a_elem = $("<a></a>")
-            a_elem.attr("href", image_url)
-            a_elem.attr("data-lightbox", "photos")
-            image_elem = $("<img>")
-            image_elem.attr("class", "img-fluid")
-            image_elem.attr("src", image_url)
-            a_elem.append(image_elem)
-            div_elem.append(a_elem)
-            row_photos.append(div_elem)
-        }
-    }
-
-
+    })
 </script>
+
 
 
 </html>
