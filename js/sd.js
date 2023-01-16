@@ -6,7 +6,7 @@ const JOB_NOT_EXISTS_ERROR = "JOB_NOT_EXISTS_ERROR"
 const INTERNAL_ERROR = "INTERNAL_ERROR"
 const CODE_OK = "OK"
 
-const PAGE_SIZE = 40
+const PAGE_SIZE = 24
 const SEARCH_PAGE_SIZE = PAGE_SIZE
 const MAX_PROMPT_DISPLAY_LENGTH = 25
 var page_num = 1
@@ -344,7 +344,7 @@ function ParseResult(mydata) {
 function QueryOnce(job_id) {
     var data = { "job_id": parseInt(job_id) }
     console.log("post data in QueryOnce is " + JSON.stringify(data))
-    fetch("http://39.107.251.11:8082/query", {
+    fetch("http://localhost/query", {
         method: "POST",
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
@@ -359,7 +359,7 @@ function QueryOnce(job_id) {
 function Query(job_id, async) {
     $.ajax({
         type: "post",//request id
-        url: "http://39.107.251.11:8082/query",
+        url: "http://localhost/query",
         data: { "job_id": job_id }, //if no param needed, do not set
         //请求成功时调用的函数
         dataType: "json",
@@ -388,7 +388,7 @@ function Generate(async) {
     console.log("post_data in Generate:" + JSON.stringify(post_data))
     $.ajax({
         type: "post",//request id
-        url: "http://39.107.251.11:8082/process",
+        url: "http://localhost/process",
         data: post_data,
         //if no param needed, do not set
         dataType: "json",
@@ -431,7 +431,7 @@ window.document.documentElement.setAttribute("data-theme", "dark");
 function Search(search_words, page_num) {
     console.log("search_words=" + search_words)
     is_search = true
-    url = "http://39.107.251.11:8082/search?page_size=" + SEARCH_PAGE_SIZE + "&page_num=" + page_num + "&search_words=" + search_words
+    url = "http://localhost/search?page_size=" + SEARCH_PAGE_SIZE + "&page_num=" + page_num + "&search_words=" + search_words
     console.log(url)
     var return_num = fetch(url, {
         method: "GET",
@@ -452,7 +452,7 @@ function Search(search_words, page_num) {
 }
 
 function LoadOnePageImages(page_num) {
-    url = "http://39.107.251.11:8082/listImages?page_size=" + PAGE_SIZE + "&page_num=" + page_num
+    url = "http://localhost/listImages?page_size=" + PAGE_SIZE + "&page_num=" + page_num
     console.log(url)
     var return_num = fetch(url, {
         method: "GET",
