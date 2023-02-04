@@ -343,7 +343,7 @@ function ParseResult(mydata) {
 
 function QueryOnce(job_id) {
     var data = { "job_id": parseInt(job_id) }
-    fetch("http://" + host + "/query", {
+    fetch("https://" + host + "/query", {
         method: "POST",
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
@@ -358,7 +358,7 @@ function QueryOnce(job_id) {
 function Query(job_id, async) {
     $.ajax({
         type: "post",//request id
-        url: "http://" + host + "/query",
+        url: "https://" + host + "/query",
         data: { "job_id": job_id }, //if no param needed, do not set
         //请求成功时调用的函数
         dataType: "json",
@@ -386,7 +386,7 @@ function Generate(async) {
     }
     $.ajax({
         type: "post",//request id
-        url: "http://" + host + "/process",
+        url: "https://" + host + "/process",
         data: post_data,
         //if no param needed, do not set
         dataType: "json",
@@ -422,7 +422,7 @@ window.document.documentElement.setAttribute("data-theme", "dark");
 
 function Search(search_words, page_num) {
     is_search = true
-    url = "http://" + host + "/search?page_size=" + SEARCH_PAGE_SIZE + "&page_num=" + page_num + "&search_words=" + search_words
+    url = "https://" + host + "/search?page_size=" + SEARCH_PAGE_SIZE + "&page_num=" + page_num + "&search_words=" + search_words
     var return_num = fetch(url, {
         method: "GET",
         headers: { 'Content-Type': 'application/json' },
@@ -441,7 +441,7 @@ function Search(search_words, page_num) {
 }
 
 function LoadOnePageImages(page_num) {
-    url = "http://" + host + "/listImages?page_size=" + PAGE_SIZE + "&page_num=" + page_num
+    url = "https://" + host + "/listImages?page_size=" + PAGE_SIZE + "&page_num=" + page_num
     var return_num = fetch(url, {
         method: "GET",
         headers: { 'Content-Type': 'application/json' },
