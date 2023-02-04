@@ -23,8 +23,17 @@
 <body>
     <div class="photo-gallery">
         <div class="container" id="main_container">
+            <div class="justify-content-end">
+                <div>
+                    <a href="#">
+                        <p id="login" class="float-end text-center" style="padding:5px;">login</p>
+                    </a>
+                </div>
+            </div>
             <div class="intro">
-                <h2 class="text-center">Prompts Database</h2>
+                <div class="col-sm-6 col-center-block">
+                    <h2 class="text-center">Prompts Database</h2>
+                </div>
             </div>
             <div class="row g-3 align-items-center">
                 <div class="col-sm-6 col-center-block mb-3">
@@ -46,25 +55,18 @@
             </div>
         </div>
         <!-- 模态框（Modal） -->
-        <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
-            aria-hidden="true">
+        <div class="modal fade" id="imageDetailModal" tabindex="-1" role="dialog"
+            aria-labelledby="imageDetailModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-xl">
                 <div class="modal-content  modal_dark">
                     <div class="container-fluid">
                         <div class="row">
-                            <!-- <div class="modal-header modal_dark">
-                                <button type="button" class="btn btn-primary" id="modal-close"
-                                    data-dismiss="modal">&times;
-                                </button>
-                            </div> -->
                             <div class="row mb-5">
-
                             </div>
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="row prompt_bg mb-3">
                                         <div id="modal-prompt">
-                                            prompt
                                         </div>
 
                                         <div class="row">
@@ -84,22 +86,6 @@
                                         </div>
                                     </div>
                                     <div class="row" id="modal-parameters">
-                                        <div class="row mb-1">
-                                            <div class="row modal-div-block-title">
-                                                seed
-                                            </div>
-                                            <div class="row modal-div-block-text">
-                                                12312313
-                                            </div>
-                                        </div>
-                                        <div class="row mb-1">
-                                            <div class="row modal-div-block-title">
-                                                Guidance scale
-                                            </div>
-                                            <div class="row modal-div-block-text">
-                                                7
-                                            </div>
-                                        </div>
                                     </div>
                                 </div>
 
@@ -130,6 +116,28 @@
                 </div><!-- /.modal -->
             </div>
         </div>
+        <!-- 登录模态框（Modal） -->
+        <div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="loginModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-md">
+                <div class="modal-content modal_dark">
+                    <div class="container-fluid">
+                        <form id="registerForm" class="form-signin" action="#">
+                            <img class="mb-4" src="https://getbootstrap.com/docs/4.0/assets/brand/bootstrap-solid.svg"
+                                alt="" width="72" height="72">
+                            <h1 class="h3 mb-3 font-weight-normal">login</h1>
+                            <input name="username" id="username" class="form-control mb-3" placeholder="username"
+                                required autofocus>
+                            <input name="password" id="password" class="form-control mb-3" placeholder="password"
+                                required>
+                            <button id="register-btn" class="btn btn-primary col-center-block"
+                                type="button">Register</button>
+                        </form>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal -->
+        </div>
+    </div>
 </body>
 
 <script src="jquery/jquery-3.6.1.min.js"></script>
@@ -142,8 +150,6 @@
         start_page_num = 1
         for (page_num = start_page_num; page_num < start_page_num + 3; page_num++) {
             return_num = LoadOnePageImages(page_num)
-            console.log("return_num=" + return_num)
-            console.log("page_num=" + page_num)
             if (return_num == undefined || return_num < PAGE_SIZE) {
                 break
             }

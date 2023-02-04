@@ -309,7 +309,6 @@ function QueryAndUpdate(job_id) {
 
 function ParseResult(mydata) {
     try {
-        console.log("Request complete! response:", mydata);
         var code = mydata["code"]
         if (code == CODE_OK) {
             queue_len = mydata["data"]["queue_len"]
@@ -344,8 +343,7 @@ function ParseResult(mydata) {
 
 function QueryOnce(job_id) {
     var data = { "job_id": parseInt(job_id) }
-    console.log("post data in QueryOnce is " + JSON.stringify(data))
-    fetch("http://"+host+"/query", {
+    fetch("http://" + host + "/query", {
         method: "POST",
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
@@ -360,7 +358,7 @@ function QueryOnce(job_id) {
 function Query(job_id, async) {
     $.ajax({
         type: "post",//request id
-        url: "http://"+host+"/query",
+        url: "http://" + host + "/query",
         data: { "job_id": job_id }, //if no param needed, do not set
         //请求成功时调用的函数
         dataType: "json",
@@ -386,10 +384,9 @@ function Generate(async) {
         "n_samples": $("#n_samples").val(),
         "sampler": $("#sampler").val()
     }
-    console.log("post_data in Generate:" + JSON.stringify(post_data))
     $.ajax({
         type: "post",//request id
-        url: "http://"+host+"/process",
+        url: "http://" + host + "/process",
         data: post_data,
         //if no param needed, do not set
         dataType: "json",
@@ -422,18 +419,10 @@ function GuidanceScaleChange() {
     document.getElementById('guidance_scale_show').innerHTML = value;
 }
 window.document.documentElement.setAttribute("data-theme", "dark");
-// document.getElementById("main_container").onscroll = function () {
-//     LoadOnePageImages(page_num);
-//     page_num++;
-//     console.log("main_container")
-//     console.log("page_num=" + page_num)
-// };
 
 function Search(search_words, page_num) {
-    console.log("search_words=" + search_words)
     is_search = true
-    url = "http://"+host+"/search?page_size=" + SEARCH_PAGE_SIZE + "&page_num=" + page_num + "&search_words=" + search_words
-    console.log(url)
+    url = "http://" + host + "/search?page_size=" + SEARCH_PAGE_SIZE + "&page_num=" + page_num + "&search_words=" + search_words
     var return_num = fetch(url, {
         method: "GET",
         headers: { 'Content-Type': 'application/json' },
@@ -441,7 +430,6 @@ function Search(search_words, page_num) {
         return response.json()
     }).then(mydata => {
         try {
-            console.log("Request complete! response:", mydata);
             image_details = mydata["data"]["result"]
             ShowImages(image_details)
             return image_details.length
@@ -453,8 +441,7 @@ function Search(search_words, page_num) {
 }
 
 function LoadOnePageImages(page_num) {
-    url = "http://"+host+"/listImages?page_size=" + PAGE_SIZE + "&page_num=" + page_num
-    console.log(url)
+    url = "http://" + host + "/listImages?page_size=" + PAGE_SIZE + "&page_num=" + page_num
     var return_num = fetch(url, {
         method: "GET",
         headers: { 'Content-Type': 'application/json' },
@@ -462,7 +449,6 @@ function LoadOnePageImages(page_num) {
         return response.json()
     }).then(mydata => {
         try {
-            console.log("Request complete! response:", mydata);
             image_details = mydata["data"]["result"]
             ShowImages(image_details)
             return image_details.length
@@ -496,27 +482,12 @@ function ShortenString(input_str, max_len) {
     }
 }
 
-// $(".img-thumbnail").mouseover(function () {
-//     var this_job_id = $($(this).parents('div').children('#j_span')).text()
-//     QueryOnce(this_job_id)
-
-// })
-
 $("body").delegate('.img-thumbnail', 'mouseover', function () {
     var this_job_id = $($(this).parents('div').children('#j_span')).text()
     QueryOnce(this_job_id)
 
 })
-/*
-                                    <div class="row mb-1">
-                                        <div class="row modal-div-block-title">
-                                            seed
-                                        </div>
-                                        <div class="row modal-div-block-text">
-                                            12312313
-                                        </div>
-                                    </div>
-                                    */
+
 function GenerateModelParameterDiv(title, text) {
     var d_elem = $("<div></div>")
     d_elem.addClass('row mb-1')
@@ -545,14 +516,12 @@ function GenerateEditorDiv(editor_str) {
     return d_elem
 }
 $("body").delegate('#editor-img-rounded', 'click', function () {
-    console.log("editor-img-rounded")
     $('#editor-image').empty();
     var img_elem = $(this).clone()
-    console.log(img_elem)
     img_elem.removeClass("img-thumbnail")
     var model_image = $("#editor-image")
     model_image.append(img_elem)
-    $("#myModal").modal("show")
+    $("#imageDetailModal").modal("show")
 })
 
 $("body").delegate('#list-img', 'click', function () {
@@ -567,13 +536,9 @@ $("body").delegate('#list-img', 'click', function () {
     var txt_elem = $($(this).parents('div').children('#l_span')).clone()
     txt_elem.removeAttr("style")
     txt_elem.attr("id", "l_span_prompt")
-    console.log(txt_elem)
     txt_elem.show()
     var model_text = $("#modal-prompt")
     model_text.append(txt_elem)
-    console.log("job_id=" + job_id)
-    console.log("prompt_str=" + prompt_str)
-    console.log("random_seed=" + random_seed)
     var btn_elem = $("#modal_copy")
     btn_elem.empty()
     btn_elem.append("<span class='bi bi-clipboard2'></span> copy prompt")
@@ -604,11 +569,11 @@ $("body").delegate('#list-img', 'click', function () {
     localStorage.setItem("n_samples", n_samples);
     localStorage.setItem("sampler", sampler);
 
-    $("#myModal").modal("show")
+    $("#imageDetailModal").modal("show")
 });
 
 $("body").delegate('#modal-close', 'click', function () {
-    $("#myModal").modal("hide")
+    $("#imageDetailModal").modal("hide")
 });
 $("body").delegate('#modal-editor', 'click', function () {
     window.open("editor.html");
@@ -629,7 +594,6 @@ function CopyTextromModal(text) {
     textarea.value = text;
     textarea.focus();
     textarea.select();
-    console.log(textarea.value)
     try {
         var flag = document.execCommand("copy");//执行复制
     } catch (eo) {
@@ -650,5 +614,28 @@ function GetInfoFromLocalStorage() {
     steps = localStorage.getItem("steps");
     n_samples = localStorage.getItem("n_samples");
     sampler = localStorage.getItem("sampler");
-    console.log("prompt=" + prompt_str)
 }
+
+$("body").delegate('#login', 'click', function () {
+    console.log("in click")
+    $("#loginModal").modal("show")
+})
+
+
+$("#register-btn").click(function () {
+    console.log("xxxxxx")
+    $.ajax({
+        type: "post",
+        url: "/register",
+        data: $("#loginForm").serialize(),
+        dataType: "json",
+        async: false,
+        crossDomain: true,
+        success: function (mydata) {
+            console.log("------------------------------")
+            console.log(mydata)
+        }
+    }).fail(function (mydata) {
+        console.log(mydata)
+    })
+})
