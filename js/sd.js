@@ -33,6 +33,7 @@ protocol = "http"
 if (host != "127.0.0.1") {
     protocol = "https"
 }
+$.ajaxSettings.async = false;
 
 $("#search_btn").click(function () {
     Init()
@@ -483,7 +484,43 @@ function LoadOnePageImages(page_num) {
         }
     });
     return return_num
+}
 
+function LoadMyImages(page_num) {
+    url = "/myImages?page_size=" + PAGE_SIZE + "&page_num=" + page_num
+    var is_end = false
+    $.ajax({
+        type: "get",
+        url: url,
+        dataType: "json",
+        async: false,
+        crossDomain: true,
+        success: function (mydata) {
+            if (mydata.hasOwnProperty("data")) {
+                image_details = mydata["data"]["result"]
+                ShowImages(image_details)
+                if (image_details.length < PAGE_SIZE) {
+                    is_end = true
+                }
+            } else {
+                job_internal_error = true
+            }
+        },
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+            console.warn(XMLHttpRequest.status);
+            console.warn(XMLHttpRequest.readyState);
+            console.warn(textStatus);
+        },
+        complete: function (XMLHttpRequest, textStatus) {
+            if (XMLHttpRequest.status != 200) {
+                console.warn("request complete:" + XMLHttpRequest.status);
+            }
+        }
+    }).fail(function (mydata) {
+        console.log("fail")
+        console.log(mydata["code"])
+        console.log(mydata)
+    })
 }
 
 function ShowImages(image_details) {
