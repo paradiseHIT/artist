@@ -412,7 +412,7 @@ function Generate(async) {
     }
     $.ajax({
         type: "post",//request id
-        url: protocol + "://" + host + "/process",
+        url: protocol + "://" + host + "/generate",
         data: post_data,
         //if no param needed, do not set
         dataType: "json",
