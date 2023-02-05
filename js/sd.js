@@ -31,7 +31,7 @@ var is_search = false
 var host = window.location.host
 protocol = "http"
 if (host != "127.0.0.1") {
-  protocol = "https"
+    protocol = "https"
 }
 
 $("#search_btn").click(function () {
@@ -729,8 +729,10 @@ $("body").delegate('#register', 'click', function () {
 
 $("#register_btn").click(function () {
     var password = $('#register_password').val();
-    if (password.length < 3) {
-        UpdateSpanContent("user_passwd_error", "password is too short")
+    if ($("#register_username").val().length < 6) {
+        UpdateSpanContent("register_error", "username is too short, at least 6 characters")
+    } else if (password.length < 6) {
+        UpdateSpanContent("register_error", "password is too short, , at least 6 characters")
     } else {
         encrpt_password = md5(password)
         var post_data = {
@@ -790,56 +792,50 @@ $("#register_btn").click(function () {
 })
 
 $("#login_btn").click(function () {
-    console.log($("#loginForm").serialize())
-    var password = $('#login_password').val();
-    if (password.length < 3) {
-        UpdateSpanContent("user_passwd_error", "password is too short")
-    } else {
-        encrpt_password = md5(password)
-        var post_data = {
-            "username": $("#login_username").val(),
-            "password": encrpt_password
-        }
-        $.ajax({
-            type: "post",
-            url: "/login",
-            data: post_data,
-            dataType: "json",
-            async: false,
-            crossDomain: true,
-            success: function (mydata) {
-                try {
-                    if (mydata["data"]["is_login"]) {
-                        user_name = mydata["data"]["user_name"]
-                        user_id = mydata["data"]["user_id"]
-                        $("#loginModal").modal("hide")
-                        // location.reload();
-                        LoginUserNav(user_name, user_id)
-                    } else {
-                        UpdateSpanContent("user_passwd_error", "username and password are not correct")
-                    }
-                } catch (error) {
-                    console.log(error)
-                    console.log("ErrorPassword in exception")
+    encrpt_password = md5($('#login_password').val())
+    var post_data = {
+        "username": $("#login_username").val(),
+        "password": encrpt_password
+    }
+    $.ajax({
+        type: "post",
+        url: "/login",
+        data: post_data,
+        dataType: "json",
+        async: false,
+        crossDomain: true,
+        success: function (mydata) {
+            try {
+                if (mydata["data"]["is_login"]) {
+                    user_name = mydata["data"]["user_name"]
+                    user_id = mydata["data"]["user_id"]
+                    $("#loginModal").modal("hide")
+                    // location.reload();
+                    LoginUserNav(user_name, user_id)
+                } else {
                     UpdateSpanContent("user_passwd_error", "username and password are not correct")
                 }
-            },
-            error: function (XMLHttpRequest, textStatus, errorThrown) {
-                console.warn(XMLHttpRequest.status);
-                console.warn(XMLHttpRequest.readyState);
-                console.warn(textStatus);
-            },
-            complete: function (XMLHttpRequest, textStatus) {
-                if (XMLHttpRequest.status != 200) {
-                    console.warn("request complete:" + XMLHttpRequest.status);
-                }
+            } catch (error) {
+                console.log(error)
+                console.log("ErrorPassword in exception")
+                UpdateSpanContent("user_passwd_error", "username and password are not correct")
             }
-        }).fail(function (mydata) {
-            console.log("fail")
-            console.log(mydata["code"])
-            console.log(mydata)
-        })
-    }
+        },
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+            console.warn(XMLHttpRequest.status);
+            console.warn(XMLHttpRequest.readyState);
+            console.warn(textStatus);
+        },
+        complete: function (XMLHttpRequest, textStatus) {
+            if (XMLHttpRequest.status != 200) {
+                console.warn("request complete:" + XMLHttpRequest.status);
+            }
+        }
+    }).fail(function (mydata) {
+        console.log("fail")
+        console.log(mydata["code"])
+        console.log(mydata)
+    })
 })
 
 $("#logout").click(function () {
