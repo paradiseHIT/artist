@@ -2,8 +2,8 @@
  * @Author: xing paradisehit@gmil.com
  * @Date: 2022-11-26 15:44:34
  * @LastEditors: xing paradisehit@gmail.com
- * @LastEditTime: 2022-12-31 12:16:09
- * @FilePath: /web/index.html
+ * @LastEditTime: 2023-02-05 12:26:22
+ * @FilePath: /web/editor.html
  * @Description:生成图片
 -->
 <!doctype html>
@@ -22,6 +22,28 @@
 <body>
     <div class="photo-gallery">
         <div class="container" id="main_container">
+            <div id="user_nav" class="row justify-content-end">
+                <div class="d-none col-md-1" id="login_div">
+                    <a href="#">
+                        <span id="login" class="text-center float-end">login</span>
+                    </a>
+                </div>
+                <div class="d-none col-md-1" id="register_div">
+                    <a href="#">
+                        <span id="register" class="text-center float-end">register</span>
+                    </a>
+                </div>
+                <div class="d-none col-md-1" id="user_div">
+                    <a href="#">
+                        <span id="user" class="text-center float-end">account</span>
+                    </a>
+                </div>
+                <div class="d-none col-md-1" id="logout_div">
+                    <a href="#">
+                        <span id="logout" class="text-center float-end">logout</span>
+                    </a>
+                </div>
+            </div>
             <div class="intro">
                 <h2 class="text-center">Prompts Database</h2>
             </div>
@@ -113,15 +135,49 @@
             </div>
         </div>
 
-        <!-- 模态框（Modal） -->
-        <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+        <!-- 注册模态框（Modal） -->
+        <div class="modal fade" id="registerModal" tabindex="-1" role="dialog" aria-labelledby="registerModalLabel"
             aria-hidden="true">
-            <div class="modal-dialog modal-xl">
-                <div class="modal-content  modal_dark">
+            <div class="modal-dialog modal-md">
+                <div class="modal-content modal_dark">
                     <div class="container-fluid">
-                        <div class="row" id="editor-image">
-                            modal-image
-                        </div>
+                        <form id="registerForm" class="form-signin" action="#">
+                            <img class="mb-4" src="https://getbootstrap.com/docs/4.0/assets/brand/bootstrap-solid.svg"
+                                alt="" width="72" height="72">
+                            <h1 class="h3 mb-3 font-weight-normal">register</h1>
+                            <input name="username" id="register_username" class="form-control mb-3"
+                                placeholder="username" required autofocus>
+                            <input name="password" type="password" id="register_password" class="form-control mb-3"
+                                placeholder="password" required>
+                            <div class="row text-center">
+                                <span id="register_error" class="text-danger text-center d-none"></span>
+                            </div>
+                            <button id="register_btn" class="btn btn-primary col-center-block"
+                                type="button">Register</button>
+                        </form>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal -->
+        </div>
+        <!-- 登录模态框（Modal） -->
+        <div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="loginModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-md">
+                <div class="modal-content modal_dark">
+                    <div class="container-fluid">
+                        <form id="loginForm" class="form-signin" action="#">
+                            <img class="mb-4" src="https://getbootstrap.com/docs/4.0/assets/brand/bootstrap-solid.svg"
+                                alt="" width="72" height="72">
+                            <h1 class="h3 mb-3 font-weight-normal">login</h1>
+                            <input name="username" id="login_username" class="form-control mb-3" placeholder="username"
+                                required autofocus>
+                            <input name="password" type="password" id="login_password" class="form-control mb-3"
+                                placeholder="password" required>
+                            <div class="row text-center">
+                                <span id="user_passwd_error" class="text-danger text-center d-none"></span>
+                            </div>
+                            <button id="login_btn" class="btn btn-primary col-center-block" type="button">Login</button>
+                        </form>
                     </div>
                 </div><!-- /.modal-content -->
             </div><!-- /.modal -->
@@ -134,9 +190,9 @@
 <script src="js/sd.js"></script>
 <script type="text/javascript">
     $(document).ready(function () {
+        ShowNav()
         GetInfoFromLocalStorage()
         DisplayQueryInfo()
-        localStorage.clear();
     })
 </script>
 

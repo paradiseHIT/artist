@@ -62,29 +62,51 @@ $("#query_btn").click(function () {
 })
 
 $("#generate_btn").click(function () {
-    if ($("#prompt").val() == "") {
-        alert("please input prompt")
-        $("#prompt").focus()
-    } else {
-        GenerateInitilize()
-        //ajax同步获取数据
-        async = false
-        job_id = Generate(async)
-        //初始化
-        if (job_id != undefined) {
-            if (query_interval_id != undefined) {
-                clearInterval(query_interval_id)
-            }
-
-            QueryAndUpdate(job_id)
-            //每隔x秒查一次
-            var x = 1000
-            query_interval_id = setInterval("QueryAndUpdate(" + job_id + ")", x);
+    if (IsLogin()) {
+        if ($("#prompt").val() == "") {
+            console.warn("please input prompt")
+            $("#prompt").focus()
         } else {
-            DisplayError()
+            GenerateInitilize()
+            async = false
+            job_id = Generate(async)
+            if (job_id != undefined) {
+                if (query_interval_id != undefined) {
+                    clearInterval(query_interval_id)
+                }
+
+                QueryAndUpdate(job_id)
+                //每隔x秒查一次
+                var x = 1000
+                query_interval_id = setInterval("QueryAndUpdate(" + job_id + ")", x);
+            } else {
+                DisplayError()
+            }
         }
+    } else {
+        $("#loginModal").modal("show")
     }
 })
+
+function IsLogin() {
+    $.ajaxSettings.async = false;
+    var is_login = false
+    $.get("/checkLogin", function (data) {
+        try {
+            if (data.hasOwnProperty("data")) {
+                if (data["data"]["is_login"] == true) {
+                    is_login = true
+                }
+            } else {
+                is_login = false
+            }
+        } catch (error) {
+            console.log(error)
+            is_login = false
+        }
+    })
+    return is_login
+}
 
 function Init() {
     query_times = 0
@@ -343,7 +365,7 @@ function ParseResult(mydata) {
 
 function QueryOnce(job_id) {
     var data = { "job_id": parseInt(job_id) }
-    fetch("https://" + host + "/query", {
+    fetch("http://" + host + "/query", {
         method: "POST",
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
@@ -358,7 +380,7 @@ function QueryOnce(job_id) {
 function Query(job_id, async) {
     $.ajax({
         type: "post",//request id
-        url: "https://" + host + "/query",
+        url: "http://" + host + "/query",
         data: { "job_id": job_id }, //if no param needed, do not set
         //请求成功时调用的函数
         dataType: "json",
@@ -386,7 +408,7 @@ function Generate(async) {
     }
     $.ajax({
         type: "post",//request id
-        url: "https://" + host + "/process",
+        url: "http://" + host + "/process",
         data: post_data,
         //if no param needed, do not set
         dataType: "json",
@@ -397,7 +419,7 @@ function Generate(async) {
             var request_id = mydata["request_id"]
             var code = mydata["code"]
             if (code != "OK") {
-                alert(request_id + " failed")
+                console.warn(request_id + " failed")
                 return
             }
             job_id = mydata["data"]["job_id"]
@@ -422,7 +444,7 @@ window.document.documentElement.setAttribute("data-theme", "dark");
 
 function Search(search_words, page_num) {
     is_search = true
-    url = "https://" + host + "/search?page_size=" + SEARCH_PAGE_SIZE + "&page_num=" + page_num + "&search_words=" + search_words
+    url = "http://" + host + "/search?page_size=" + SEARCH_PAGE_SIZE + "&page_num=" + page_num + "&search_words=" + search_words
     var return_num = fetch(url, {
         method: "GET",
         headers: { 'Content-Type': 'application/json' },
@@ -441,7 +463,7 @@ function Search(search_words, page_num) {
 }
 
 function LoadOnePageImages(page_num) {
-    url = "https://" + host + "/listImages?page_size=" + PAGE_SIZE + "&page_num=" + page_num
+    url = "http://" + host + "/listImages?page_size=" + PAGE_SIZE + "&page_num=" + page_num
     var return_num = fetch(url, {
         method: "GET",
         headers: { 'Content-Type': 'application/json' },
@@ -616,26 +638,238 @@ function GetInfoFromLocalStorage() {
     sampler = localStorage.getItem("sampler");
 }
 
-$("body").delegate('#login', 'click', function () {
-    console.log("in click")
-    $("#loginModal").modal("show")
-})
+function LoginUserNav(user_name, user_id) {
+    var register_div_elem = $("#register_div")
+    register_div_elem.addClass("d-none")
 
+    var login_div_elem = $("#login_div")
+    login_div_elem.addClass("d-none")
 
-$("#register-btn").click(function () {
-    console.log("xxxxxx")
+    var user_div_elem = $("#logout_div")
+    user_div_elem.removeClass("d-none")
+
+    var user_div_elem = $("#user_div")
+    user_div_elem.removeClass("d-none")
+    $("#user_div > a").attr("href", "/" + user_id)
+}
+
+function NotLoginUserNav() {
+    var register_div_elem = $("#register_div")
+    register_div_elem.removeClass("d-none")
+
+    var login_div_elem = $("#login_div")
+    login_div_elem.removeClass("d-none")
+
+    var user_div_elem = $("#user_div")
+    user_div_elem.addClass("d-none")
+
+    var user_div_elem = $("#logout_div")
+    user_div_elem.addClass("d-none")
+}
+
+function ErrorPassword() {
+    var u_p_elem = $("#user_passwd_error")
+    u_p_elem.removeClass("d-none")
+}
+
+function ErrorRegister() {
+    var reg_elem = $("#register_error")
+    reg_elem.removeClass("d-none")
+}
+function UpdateSpanContent(element_id, content) {
+    document.getElementById(element_id).innerHTML = content
+    var elem = $("#" + element_id)
+    elem.removeClass("d-none")
+}
+function ShowNav() {
     $.ajax({
-        type: "post",
-        url: "/register",
-        data: $("#loginForm").serialize(),
+        type: "get",
+        url: "/checkLogin",
         dataType: "json",
         async: false,
         crossDomain: true,
         success: function (mydata) {
-            console.log("------------------------------")
-            console.log(mydata)
+            if (mydata["data"]["is_login"]) {
+                user_name = mydata["data"]["user_name"]
+                user_id = mydata["data"]["user_id"]
+                LoginUserNav(user_name, user_id)
+            } else {
+                NotLoginUserNav()
+            }
+        },
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+            console.warn(XMLHttpRequest.status);
+            console.warn(XMLHttpRequest.readyState);
+            console.warn(textStatus);
+        },
+        complete: function (XMLHttpRequest, textStatus) {
+            if (XMLHttpRequest.status != 200) {
+                console.warn("request complete:" + XMLHttpRequest.status);
+            }
         }
     }).fail(function (mydata) {
+        console.log("fail")
+        console.log(mydata["code"])
+        console.log(mydata)
+    })
+
+}
+
+$("body").delegate('#login', 'click', function () {
+    $("#loginModal").modal("show")
+})
+
+$("body").delegate('#register', 'click', function () {
+    $("#registerModal").modal("show")
+})
+
+$("#register_btn").click(function () {
+    var password = $('#register_password').val();
+    if (password.length < 3) {
+        UpdateSpanContent("user_passwd_error", "password is too short")
+    } else {
+        encrpt_password = md5(password)
+        var post_data = {
+            "username": $("#register_username").val(),
+            "password": encrpt_password
+        }
+        $.ajax({
+            type: "post",
+            url: "/register",
+            data: post_data,
+            dataType: "json",
+            async: false,
+            crossDomain: true,
+            success: function (mydata) {
+                try {
+                    if (mydata.hasOwnProperty("data")) {
+                        if (mydata["data"]["is_login"]) {
+                            user_name = mydata["data"]["user_name"]
+                            user_id = mydata["data"]["user_id"]
+                            $("#registerModal").modal("hide")
+                            // location.reload();
+                            LoginUserNav(user_name, user_id)
+                        } else {
+                            UpdateSpanContent("register_error", mydata["message"])
+                        }
+                    } else {
+                        if (mydata["code"] == "USER_EXISTS_ERROR") {
+                            UpdateSpanContent("register_error", mydata["message"])
+                        } else if (mydata["code"] == "PARAMETER_ERROR") {
+                            UpdateSpanContent("register_error", mydata["message"])
+                        } else {
+                            UpdateSpanContent("register_error", "Internal Error")
+                        }
+                    }
+                } catch (error) {
+                    console.log(error)
+                    console.log("ErrorInput in exception")
+                    ErrorRegister()
+                }
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                console.warn(XMLHttpRequest.status);
+                console.warn(XMLHttpRequest.readyState);
+                console.warn(textStatus);
+            },
+            complete: function (XMLHttpRequest, textStatus) {
+                if (XMLHttpRequest.status != 200) {
+                    console.warn("request complete:" + XMLHttpRequest.status);
+                }
+            }
+        }).fail(function (mydata) {
+            console.log("fail")
+            console.log(mydata["code"])
+            console.log(mydata)
+        })
+    }
+})
+
+$("#login_btn").click(function () {
+    console.log($("#loginForm").serialize())
+    var password = $('#login_password').val();
+    if (password.length < 3) {
+        UpdateSpanContent("user_passwd_error", "password is too short")
+    } else {
+        encrpt_password = md5(password)
+        var post_data = {
+            "username": $("#login_username").val(),
+            "password": encrpt_password
+        }
+        $.ajax({
+            type: "post",
+            url: "/login",
+            data: post_data,
+            dataType: "json",
+            async: false,
+            crossDomain: true,
+            success: function (mydata) {
+                try {
+                    if (mydata["data"]["is_login"]) {
+                        user_name = mydata["data"]["user_name"]
+                        user_id = mydata["data"]["user_id"]
+                        $("#loginModal").modal("hide")
+                        // location.reload();
+                        LoginUserNav(user_name, user_id)
+                    } else {
+                        UpdateSpanContent("user_passwd_error", "username and password are not correct")
+                    }
+                } catch (error) {
+                    console.log(error)
+                    console.log("ErrorPassword in exception")
+                    UpdateSpanContent("user_passwd_error", "username and password are not correct")
+                }
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                console.warn(XMLHttpRequest.status);
+                console.warn(XMLHttpRequest.readyState);
+                console.warn(textStatus);
+            },
+            complete: function (XMLHttpRequest, textStatus) {
+                if (XMLHttpRequest.status != 200) {
+                    console.warn("request complete:" + XMLHttpRequest.status);
+                }
+            }
+        }).fail(function (mydata) {
+            console.log("fail")
+            console.log(mydata["code"])
+            console.log(mydata)
+        })
+    }
+})
+
+$("#logout").click(function () {
+    $.ajax({
+        type: "get",
+        url: "/logout",
+        async: false,
+        crossDomain: true,
+        success: function (mydata) {
+            try {
+                if (mydata["data"]["is_login"] != true) {
+                    location.reload();
+                } else {
+                    console.log("got error when logout")
+                }
+            } catch (error) {
+                console.log("got error when logout")
+                location.reload();
+            }
+        },
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+            console.warn(XMLHttpRequest.status);
+            console.warn(XMLHttpRequest.readyState);
+            console.warn(textStatus);
+        },
+        complete: function (XMLHttpRequest, textStatus) {
+            if (XMLHttpRequest.status != 200) {
+                console.warn("request complete:" + XMLHttpRequest.status);
+            }
+        }
+    }).fail(function (mydata) {
+        console.log("fail")
+        console.log(mydata["code"])
         console.log(mydata)
     })
 })
+
