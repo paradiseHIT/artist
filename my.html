@@ -2,7 +2,7 @@
  * @Author: xing paradisehit@gmil.com
  * @Date: 2022-11-26 15:44:34
  * @LastEditors: xing paradisehit@gmail.com
- * @LastEditTime: 2023-02-05 23:43:21
+ * @LastEditTime: 2023-02-07 00:02:58
  * @FilePath: /web/my.html
  * @Description:生成图片
 -->
@@ -26,22 +26,22 @@
             <div id="user_nav" class="row justify-content-end">
                 <div class="d-none col-md-1" id="login_div">
                     <a href="#">
-                        <span id="login" class="text-center float-end">login</span>
+                        <span id="login" class="text-center float-end">Login</span>
                     </a>
                 </div>
                 <div class="d-none col-md-1" id="register_div">
                     <a href="#">
-                        <span id="register" class="text-center float-end">register</span>
+                        <span id="register" class="text-center float-end">Register</span>
                     </a>
                 </div>
                 <div class="d-none col-md-1" id="user_div">
                     <a href="#">
-                        <span id="user" class="text-center float-end">account</span>
+                        <span id="user" class="text-center float-end">Home</span>
                     </a>
                 </div>
                 <div class="d-none col-md-1" id="logout_div">
                     <a href="#">
-                        <span id="logout" class="text-center float-end">logout</span>
+                        <span id="logout" class="text-center float-end">Logout</span>
                     </a>
                 </div>
             </div>
@@ -53,14 +53,14 @@
             <div class="row g-3 align-items-center">
                 <div class="col-sm-6 col-center-block mb-3">
                     <input type="text" class="form-control " id="search_words" aria-describedby="Search"
-                        placeholder="Search AI images">
+                        placeholder="Search My AI images">
                 </div>
             </div>
             <div class="row g-3 align-items-center">
 
                 <div class="col-sm-6 col-center-block mb-3">
-                    <input name="" id="search_btn" class="btn btn-primary col-center-block" type="button"
-                        value="Search">
+                    <input name="" id="my_search_btn" class="btn btn-primary col-center-block" type="button"
+                        value="My Search">
                 </div>
             </div>
 
@@ -186,31 +186,9 @@
 <script type="text/javascript" src="js/md5.min.js"></script>
 <script type="text/javascript" src="js/sd.js"></script>
 <script type="text/javascript">
-
-    $(document).ready(function () {
-        ShowNav()
-        image_details = []
-        start_page_num = 1
-        for (page_num = start_page_num; page_num < start_page_num + 1; page_num++) {
-            return_num = LoadMyImages(page_num)
-            if (return_num == undefined || return_num < PAGE_SIZE) {
-                break
-            }
-        }
-    })
-    $(window).scroll(function () {
-        var scrollTop = $(this).scrollTop(); //滚动条距离顶部的高度
-        var scrollHeight = $(document).height(); //当前页面的总高度
-        var clientHeight = $(this).height(); //当前可视的页面高度
-        if (scrollTop + clientHeight >= scrollHeight - 30) {
-            if (is_search) {
-                Search(search_words, page_num)
-            } else {
-                LoadOnePageImages(page_num)
-            }
-            page_num++
-        }
-    })
+    var is_my = true
+    $(document).ready(InitLoadMyPage)
+    $(window).scroll(ScrollPage)
 </script>
 
 </html>

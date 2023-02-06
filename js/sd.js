@@ -42,6 +42,13 @@ $("#search_btn").click(function () {
     Search(search_words, page_num)
     page_num++
 })
+$("#my_search_btn").click(function () {
+    Init()
+    search_words = $("#search_words").val()
+    EmptyDisplay()
+    Search(search_words, page_num, true)
+    page_num++
+})
 
 $("#query_btn").click(function () {
     job_id = $("#job_id").val()
@@ -81,7 +88,6 @@ $("#generate_btn").click(function () {
                 }
 
                 QueryAndUpdate(job_id)
-                //每隔x秒查一次
                 var x = 1000
                 query_interval_id = setInterval("QueryAndUpdate(" + job_id + ")", x);
             } else {
@@ -92,6 +98,51 @@ $("#generate_btn").click(function () {
         $("#loginModal").modal("show")
     }
 })
+
+function InitLoadPage() {
+    ShowNav()
+    image_details = []
+    page_num = 1
+    for (start_page_num = 1; page_num < start_page_num + 1; page_num++) {
+        var continued = LoadGeneratedImages(page_num, is_my)
+        if (continued == false) {
+            break
+        }
+    }
+}
+function InitLoadMyPage() {
+    ShowNav()
+    if (!IsLogin()) {
+        $("#loginModal").modal("show")
+    } else {
+        image_details = []
+        page_num = 1
+        for (start_page_num = 1; page_num < start_page_num + 1; page_num++) {
+            var continued = LoadGeneratedImages(page_num, is_my)
+            if (continued == false) {
+                break
+            }
+
+        }
+    }
+}
+
+function ScrollPage() {
+    var scrollTop = $(this).scrollTop(); //scroll to top's height
+    var scrollHeight = $(document).height(); //this pages's height
+    var clientHeight = $(this).height(); //now height
+    if (scrollTop + clientHeight >= scrollHeight - 30) {
+        var continued = true
+        if (is_search) {
+            continued = Search(search_words, page_num, is_my)
+        } else {
+            continued = LoadGeneratedImages(page_num, is_my)
+        }
+        if (continued) {
+            page_num++
+        }
+    }
+}
 
 function IsLogin() {
     $.ajaxSettings.async = false;
@@ -186,7 +237,7 @@ function DisplayError() {
     var queue_div = $("<div></div>")
     queue_div.attr("id", "queue_div")
 
-    q_text = "<p>内部错误</p>"
+    q_text = "<p>Internal Error</p>"
     queue_div.append($(q_text))
     $(".container").append(queue_div)
 }
@@ -447,80 +498,56 @@ function GuidanceScaleChange() {
 }
 window.document.documentElement.setAttribute("data-theme", "dark");
 
-function Search(search_words, page_num) {
+function Search(search_words, page_num, is_my) {
     is_search = true
-    url = protocol + "://" + host + "/search?page_size=" + SEARCH_PAGE_SIZE + "&page_num=" + page_num + "&search_words=" + search_words
-    var return_num = fetch(url, {
-        method: "GET",
-        headers: { 'Content-Type': 'application/json' },
-    }).then(response => {
-        return response.json()
-    }).then(mydata => {
+    url = "/search?page_size=" + SEARCH_PAGE_SIZE + "&page_num=" + page_num + "&search_words=" + search_words
+    if (is_my) {
+        url += "&is_my=true"
+    }
+    var can_continue = true
+    $.get(url, function (mydata) {
         try {
-            image_details = mydata["data"]["result"]
-            ShowImages(image_details)
-            return image_details.length
-        } catch (error) {
-            job_internal_error = true
-        }
-    });
-    return return_num
-}
-
-function LoadOnePageImages(page_num) {
-    url = protocol + "://" + host + "/listImages?page_size=" + PAGE_SIZE + "&page_num=" + page_num
-    var return_num = fetch(url, {
-        method: "GET",
-        headers: { 'Content-Type': 'application/json' },
-    }).then(response => {
-        return response.json()
-    }).then(mydata => {
-        try {
-            image_details = mydata["data"]["result"]
-            ShowImages(image_details)
-            return image_details.length
-        } catch (error) {
-            job_internal_error = true
-        }
-    });
-    return return_num
-}
-
-function LoadMyImages(page_num) {
-    url = "/myImages?page_size=" + PAGE_SIZE + "&page_num=" + page_num
-    var is_end = false
-    $.ajax({
-        type: "get",
-        url: url,
-        dataType: "json",
-        async: false,
-        crossDomain: true,
-        success: function (mydata) {
             if (mydata.hasOwnProperty("data")) {
                 image_details = mydata["data"]["result"]
-                ShowImages(image_details)
-                if (image_details.length < PAGE_SIZE) {
-                    is_end = true
+                if (image_details.length > 0) {
+                    ShowImages(image_details)
+                } else {
+                    can_continue = false
                 }
             } else {
-                job_internal_error = true
-            }
-        },
-        error: function (XMLHttpRequest, textStatus, errorThrown) {
-            console.warn(XMLHttpRequest.status);
-            console.warn(XMLHttpRequest.readyState);
-            console.warn(textStatus);
-        },
-        complete: function (XMLHttpRequest, textStatus) {
-            if (XMLHttpRequest.status != 200) {
-                console.warn("request complete:" + XMLHttpRequest.status);
+                can_continue = false
             }
         }
-    }).fail(function (mydata) {
-        console.log("fail")
-        console.log(mydata["code"])
-        console.log(mydata)
+        catch (error) {
+            console.log(error)
+            can_continue = false
+        }
     })
+    return can_continue
+}
+
+function LoadGeneratedImages(page_num, is_my) {
+    url = "/listImages?page_size=" + PAGE_SIZE + "&page_num=" + page_num + "&is_my=" + is_my
+    var can_continue = true
+    $.get(url, function (mydata) {
+        try {
+            if (mydata.hasOwnProperty("data")) {
+                image_details = mydata["data"]["result"]
+                if (image_details.length > 0) {
+                    ShowImages(image_details)
+                } else {
+                    can_continue = false
+                }
+            } else {
+                can_continue = false
+            }
+        }
+        catch (error) {
+            console.log(error)
+            can_continue = false
+        }
+    })
+    return can_continue
 }
 
 function ShowImages(image_details) {
@@ -691,7 +718,6 @@ function LoginUserNav(user_name, user_id) {
 
     var user_div_elem = $("#user_div")
     user_div_elem.removeClass("d-none")
-    $("#user_div > a").attr("href", "/" + user_id)
 }
 
 function NotLoginUserNav() {
@@ -847,8 +873,8 @@ $("#login_btn").click(function () {
                     user_name = mydata["data"]["user_name"]
                     user_id = mydata["data"]["user_id"]
                     $("#loginModal").modal("hide")
-                    // location.reload();
-                    LoginUserNav(user_name, user_id)
+                    location.reload();
+                    // LoginUserNav(user_name, user_id)
                 } else {
                     UpdateSpanContent("user_passwd_error", "username and password are not correct")
                 }
