@@ -272,19 +272,44 @@ function DisplayJobid(j_id) {
     }
 }
 function DisplayQueryInfo() {
-    $("#job_id").val(job_id)
-    $("#prompt").val(prompt_str)
-    $("#width").val(width)
-    $("#height").val(height)
-    $("#steps").val(steps)
-    document.getElementById('steps_show').innerHTML = steps;
-    document.getElementById('guidance_scale_show').innerHTML = guidance_scale;
-    $("#guidance_scale").val(guidance_scale)
-    $("#random_seed").val(random_seed)
-    $("#negative_prompt").val(negative_prompt)
-    $("#n_samples").val(n_samples)
-    document.getElementById('sampler').value = sampler;
+    // $("#job_id").val(job_id)
+    UpdateElementValue("#job_id", job_id)
+    // $("#prompt").val(prompt_str)
+    UpdateElementValue("#prompt_str", prompt_str)
+    // $("#width").val(width)
+    UpdateElementValue("#width", width)
+    // $("#height").val(height)
+    UpdateElementValue("#height", height)
+    // $("#steps").val(steps)
+    UpdateElementValue("#steps", steps)
+    if (typeof (steps) != "undefined") {
+        document.getElementById('steps_show').innerHTML = steps;
+    }
+    if (typeof (guidance_scale) != "undefined") {
+        document.getElementById('guidance_scale_show').innerHTML = guidance_scale;
+        $("#guidance_scale").val(guidance_scale)
+    }
+    // $("#random_seed").val(random_seed)
+    UpdateElementValue("#random_seed", random_seed)
+    // $("#negative_prompt").val(negative_prompt)
+    UpdateElementValue("#negative_prompt", negative_prompt)
+    if (typeof (sampler) != "undefined") {
+
+        document.getElementById('sampler').value = sampler;
+    }
+    // $("#n_samples").val(n_samples)
+    UpdateElementValue("#n_samples", n_samples)
 }
+
+function UpdateElementValue(element, value) {
+    console.log(element)
+    console.log(value)
+    if (typeof (value) != "undefined") {
+        $(element).val(value)
+    }
+
+}
+
 function UpdateEditorImages(image_urls, job_id) {
     var row_photos = $("#row_div")
     for (var i = 0; i < image_urls.length; i++) {
