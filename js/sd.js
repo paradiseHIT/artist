@@ -646,6 +646,7 @@ $("body").delegate('#list-img', 'click', function () {
 
     var img_elem = $(this).clone()
     img_elem.removeClass("img-thumbnail")
+    img_elem.removeAttr("id")
     var model_image = $(".modal-image")
     model_image.append(img_elem)
     var txt_elem = $($(this).parents('div').children('#l_span')).clone()
