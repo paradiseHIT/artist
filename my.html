@@ -2,7 +2,7 @@
  * @Author: xing paradisehit@gmil.com
  * @Date: 2022-11-26 15:44:34
  * @LastEditors: xing paradisehit@gmail.com
- * @LastEditTime: 2023-02-09 00:15:58
+ * @LastEditTime: 2023-02-10 00:24:31
  * @FilePath: /web/my.html
  * @Description:生成图片
 -->
@@ -74,58 +74,58 @@
             aria-labelledby="imageDetailModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-xl">
                 <div class="modal-content  modal_dark">
-                    <div class="container-fluid">
+                    <div class="modal-header modal_text">
+                        <h5 class="modal-title">Image details</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close">
+                        </button>
+                    </div>
+                    <div class="container-fluid mb-3 mt-4">
                         <div class="row">
-                            <div class="col-md-12">
-                                <div class="row mt-5">
-                                    <div class="col-md-6">
-                                        <div class="row prompt_bg mb-3">
-                                            <div id="modal-prompt">
-                                            </div>
-
-                                            <div class="row">
-                                                <div class="modal_text">
-                                                    <div class="btn btn-secondary" id="modal_copy">
-                                                        <span class="bi bi-clipboard2"></span>
-                                                        copy prompt
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
+                            <div class="col-md-6">
+                                <div class="row prompt_bg mb-3">
+                                    <div id="modal-prompt">
                                     </div>
-                                    <div class="row ml-3">
-                                        <div class="col">
-                                            <div class="btn btn-secondary col-sm-12" id="modal-editor"><span
-                                                    class="bi bi-pencil-square"></span>Open in editor</div>
-                                        </div>
-                                    </div>
-                                    <div class="row" id="modal-parameters">
-                                    </div>
-                                </div>
-
-                                <div class="col-md-6">
                                     <div class="row">
-                                        <div class="modal-image">
-                                            modal-image
+                                        <div class="modal_text">
+                                            <div class="btn btn-secondary" id="modal_copy">
+                                                <span class="bi bi-clipboard2"></span>
+                                                copy prompt
+                                            </div>
                                         </div>
+                                    </div>
 
+                                </div>
+                                <div class="row ml-3">
+                                    <div class="col">
+                                        <div class="btn btn-secondary col-sm-12" id="modal-editor"><span
+                                                class="bi bi-pencil-square"></span>Open in editor</div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="row">
-                                <div class="row modal_text">
-                                    <div class="btn btn-secondary col-sm-4  mx-auto" id="modal-close">
-                                        <span class="bi bi-x-circle"></span>
-                                        Close
-                                    </div>
+                                <div class="row" id="modal-parameters">
                                 </div>
                             </div>
-                            <!-- </div>
+
+                            <div class="col-md-6">
+                                <div class="row modal_img">
+                                    <div class="modal-image">
+                                        modal-image
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row modal_text">
+                            <div class="btn btn-secondary col-sm-2 col-xs-2 mx-auto col-center-block" id="modal-close">
+                                <span class="bi bi-x-circle"></span>
+                                Close
+                            </div>
+                        </div>
+                        <!-- </div>
                         <div class="row">
                             <div class="modal-footer">
                             </div>
                         </div> -->
-                        </div>
                     </div><!-- /.modal-content -->
                 </div><!-- /.modal -->
             </div>
