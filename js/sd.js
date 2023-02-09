@@ -52,8 +52,8 @@ $("#my_search_btn").click(function () {
 
 $("#query_btn").click(function () {
     job_id = $("#job_id").val()
+    localStorage.setItem("job_id", job_id);
     var reg = /^[0-9]+$/gi
-    var stop_inteval
     if (job_id == 0 || !reg.test(job_id)) {
         $("#job_id").val("please input job id")
     } else {
@@ -275,7 +275,7 @@ function DisplayQueryInfo() {
     // $("#job_id").val(job_id)
     UpdateElementValue("#job_id", job_id)
     // $("#prompt").val(prompt_str)
-    UpdateElementValue("#prompt_str", prompt_str)
+    UpdateElementValue("#prompt", prompt_str)
     // $("#width").val(width)
     UpdateElementValue("#width", width)
     // $("#height").val(height)
@@ -322,7 +322,7 @@ function UpdateEditorImages(image_urls, job_id) {
         image_elem = $("<img>")
         image_elem.addClass("img-fluid img-thumbnail")
         image_elem.attr("src", image_url)
-        image_elem.attr("id", "editor-img-rounded")
+        image_elem.attr("id", "list-img")
         a_elem.append(image_elem)
         div_elem.append(a_elem)
 
@@ -457,22 +457,6 @@ function QueryOnce(job_id) {
     });
 
 }
-
-function Query(job_id, async) {
-    $.ajax({
-        type: "post",//request id
-        url: protocol + "://" + host + "/query",
-        data: { "job_id": job_id }, //if no param needed, do not set
-        //请求成功时调用的函数
-        dataType: "json",
-        async: async,
-        crossDomain: true,
-        success: ParseResult(mydata)
-    }).fail(function (mydata) {
-        job_internal_error = false
-    })
-}
-
 
 function Generate(async) {
     var job_id
@@ -630,14 +614,6 @@ function GenerateEditorDiv(editor_str) {
     d_elem.append(btn_elem)
     return d_elem
 }
-$("body").delegate('#editor-img-rounded', 'click', function () {
-    $('#editor-image').empty();
-    var img_elem = $(this).clone()
-    img_elem.removeClass("img-thumbnail")
-    var model_image = $("#editor-image")
-    model_image.append(img_elem)
-    $("#imageDetailModal").modal("show")
-})
 
 $("body").delegate('#list-img', 'click', function () {
     $('.modal-image').empty();
@@ -647,6 +623,7 @@ $("body").delegate('#list-img', 'click', function () {
     var img_elem = $(this).clone()
     img_elem.removeClass("img-thumbnail")
     img_elem.removeAttr("id")
+    img_elem.addClass("modal_img")
     var model_image = $(".modal-image")
     model_image.append(img_elem)
     var txt_elem = $($(this).parents('div').children('#l_span')).clone()
@@ -721,6 +698,7 @@ function CopyTextromModal(text) {
 }
 
 function GetInfoFromLocalStorage() {
+    job_id = localStorage.getItem("job_id");
     width = localStorage.getItem("width");
     height = localStorage.getItem("height");
     random_seed = localStorage.getItem("random_seed");

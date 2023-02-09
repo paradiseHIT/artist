@@ -19,7 +19,8 @@ body {
 .prompt_bg {
     background-color: var(--pbg);
     color: var(--textColor);
-    margin-left: 1px;
+    margin-left: auto;
+    margin-right: auto;
     border-radius: 5px
 }
 
@@ -60,11 +61,22 @@ body {
     }
 }
 
-.myimg-rounded {
-    border-radius: 6px
+.modal_img {
+    display: inline-block;
+    width: auto;
+    max-height: 512px;
+    border-radius: 6px;
+    text-align: center;
+    vertical-align: middle;
 }
 
-.image_max {
-    width: auto;
-    height: 100%;
+.modal-header {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--bs-modal-header-padding);
+    border-bottom: var(--bs-modal-header-border-width) solid #55585b;
+    border-top-left-radius: var(--bs-modal-inner-border-radius);
+    border-top-right-radius: var(--bs-modal-inner-border-radius);
 }
