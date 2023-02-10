@@ -686,10 +686,8 @@ $("body").delegate('#modal_copy', 'click', function () {
 
 $("body").delegate('#modal_favorite', 'click', function () {
     var image_id = $('#image_id_span').text()
-    alert(image_id)
     var class_name = $('#span_fav').attr("class")
     $('#span_fav').removeClass("bi-heart bi-heart-fill")
-    console.log(class_name)
     if (class_name == "bi bi-heart") {
         $('#span_fav').addClass("bi-heart-fill")
         post_data = {
