@@ -630,8 +630,13 @@ $("body").delegate('#list-img', 'click', function () {
     txt_elem.removeAttr("style")
     txt_elem.attr("id", "l_span_prompt")
     txt_elem.show()
+    var image_id_elem = $($(this).parents('div').children('#j_span')).clone()
+    image_id_elem.removeAttr("style")
+    image_id_elem.attr("id", "image_id_span")
+    image_id_elem.hide()
     var model_text = $("#modal-prompt")
     model_text.append(txt_elem)
+    model_text.append(image_id_elem)
     var btn_elem = $("#modal_copy")
     btn_elem.empty()
     btn_elem.append("<span class='bi bi-clipboard2'></span> copy prompt")
@@ -672,12 +677,53 @@ $("body").delegate('#modal-editor', 'click', function () {
     window.open("editor.html");
 });
 
-
 $("body").delegate('#modal_copy', 'click', function () {
     $('#modal_copy').empty();
     $('#modal_copy').append("<span class='bi bi-clipboard2-check'></span> copied")
     var txt = $('#l_span_prompt').text()
     CopyTextromModal(txt)
+})
+
+$("body").delegate('#modal_favorite', 'click', function () {
+    var image_id = $('#image_id_span').text()
+    alert(image_id)
+    var class_name = $('#span_fav').attr("class")
+    $('#span_fav').removeClass("bi-heart bi-heart-fill")
+    console.log(class_name)
+    if (class_name == "bi bi-heart") {
+        $('#span_fav').addClass("bi-heart-fill")
+        post_data = {
+            "image_id": image_id,
+            "is_fav": true
+        }
+        $.post("/favorite", post_data, function (data) {
+            try {
+                if (data["message"] == "success") {
+                    $('#span_fav').addClass("bi-heart-fill")
+                } else {
+                    alert(data["message"])
+                }
+            } catch (error) {
+                console.log(error)
+            }
+        })
+    } else {
+        post_data = {
+            "image_id": image_id,
+            "is_fav": false
+        }
+        $.post("/favorite", post_data, function (data) {
+            try {
+                if (data["message"] == "success") {
+                    $('#span_fav').addClass("bi-heart")
+                } else {
+                    alert(data["message"])
+                }
+            } catch (error) {
+                console.log(error)
+            }
+        })
+    }
 })
 
 function CopyTextromModal(text) {
