@@ -2,7 +2,7 @@
  * @Author: xing paradisehit@gmil.com
  * @Date: 2022-11-26 15:44:34
  * @LastEditors: xing paradisehit@gmail.com
- * @LastEditTime: 2023-02-10 00:24:06
+ * @LastEditTime: 2023-02-11 20:02:39
  * @FilePath: /web/editor-inner.html
  * @Description:生成图片
 -->
@@ -33,15 +33,17 @@
                         <span id="register" class="text-center float-end">Register</span>
                     </a>
                 </div>
-                <div class="d-none col-md-1" id="user_div">
-                    <a href="#">
-                        <span id="user" class="text-center float-end">Home</span>
-                    </a>
-                </div>
-                <div class="d-none col-md-1" id="logout_div">
-                    <a href="/my.html">
-                        <span id="logout" class="text-center float-end">Logout</span>
-                    </a>
+                <div class="d-none dropdown" id="dropdown_home_div">
+                    <button class="btn btn-secondary dropdown-toggle float-end" type="button" id="dropdownMenuButton"
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                        Home
+                    </button>
+                    <ul class="dropdown-menu dropdown_dark" aria-labelledby="dropdownMenuButton">
+                        <li><a class="dropdown-item modal_text" id="user_div" href="my.html">
+                                <span>MyImages</span></a></li>
+                        <li><a class="dropdown-item modal_text" href="editor.html">GoToCreate</a></li>
+                        <li><a class="dropdown-item modal_text" id="logout" href="#">Logout</a></li>
+                    </ul>
                 </div>
             </div>
             <div class="intro">
@@ -214,7 +216,7 @@
 </body>
 
 <script src="jquery/jquery-3.6.1.min.js"></script>
-<script src="bootstrap/js/bootstrap.min.js"></script>
+<script src="bootstrap/js/bootstrap.bundle.min.js"></script>
 <script type="text/javascript" src="js/md5.min.js"></script>
 <script src="js/sd.js"></script>
 <script type="text/javascript">

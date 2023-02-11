@@ -16,6 +16,11 @@ body {
     color: var(--textColor);
 }
 
+.dropdown_dark {
+    background-color: #938e8e;
+    color: var(--textColor);
+}
+
 .prompt_bg {
     background-color: var(--pbg);
     color: var(--textColor);
@@ -27,7 +32,6 @@ body {
 .modal_text {
     color: var(--textColor);
 }
-
 
 .col-center-block {
     float: none;

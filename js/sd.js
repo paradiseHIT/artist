@@ -109,6 +109,7 @@ function InitLoadPage() {
             break
         }
     }
+    localStorage.clear()
 }
 function InitLoadMyPage() {
     ShowNav()
@@ -761,10 +762,7 @@ function LoginUserNav(user_name, user_id) {
     var login_div_elem = $("#login_div")
     login_div_elem.addClass("d-none")
 
-    var user_div_elem = $("#logout_div")
-    user_div_elem.removeClass("d-none")
-
-    var user_div_elem = $("#user_div")
+    var user_div_elem = $("#dropdown_home_div")
     user_div_elem.removeClass("d-none")
 }
 
@@ -775,10 +773,7 @@ function NotLoginUserNav() {
     var login_div_elem = $("#login_div")
     login_div_elem.removeClass("d-none")
 
-    var user_div_elem = $("#user_div")
-    user_div_elem.addClass("d-none")
-
-    var user_div_elem = $("#logout_div")
+    var user_div_elem = $("#dropdown_home_div")
     user_div_elem.addClass("d-none")
 }
 
