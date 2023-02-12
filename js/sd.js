@@ -283,10 +283,10 @@ function DisplayQueryInfo() {
     UpdateElementValue("#height", height)
     // $("#steps").val(steps)
     UpdateElementValue("#steps", steps)
-    if (typeof (steps) != "undefined") {
+    if (steps != "undefined") {
         document.getElementById('steps_show').innerHTML = steps;
     }
-    if (typeof (guidance_scale) != "undefined") {
+    if (guidance_scale != "undefined") {
         document.getElementById('guidance_scale_show').innerHTML = guidance_scale;
         $("#guidance_scale").val(guidance_scale)
     }
@@ -566,10 +566,10 @@ function ShowImages(image_details) {
     job_ids = []
     image_ids = []
     for (var i = 0; i < image_details.length; i++) {
-        image_urls.push(image_details[i]["image_url"])
+        image_urls.push(image_details[i]["cover_image_url"])
         prompts.push(image_details[i]["prompt"])
         job_ids.push(image_details[i]["job_id"])
-        image_ids.push(image_details[i]["image_id"])
+        image_ids.push(image_details[i]["cover_image_id"])
     }
     UpdateImages(image_urls, prompts, job_ids, image_ids)
 }
@@ -631,12 +631,17 @@ $("body").delegate('#list-img', 'click', function () {
     txt_elem.removeAttr("style")
     txt_elem.attr("id", "l_span_prompt")
     txt_elem.show()
-    var image_id_elem = $($(this).parents('div').children('#j_span')).clone()
+    var job_id_elem = $($(this).parents('div').children('#j_span')).clone()
+    job_id_elem.removeAttr("style")
+    job_id_elem.attr("id", "job_id_span")
+    job_id_elem.hide()
+    var image_id_elem = $($(this).parents('div').children('#i_span')).clone()
     image_id_elem.removeAttr("style")
     image_id_elem.attr("id", "image_id_span")
     image_id_elem.hide()
     var model_text = $("#modal-prompt")
     model_text.append(txt_elem)
+    model_text.append(job_id_elem)
     model_text.append(image_id_elem)
     var btn_elem = $("#modal_copy")
     btn_elem.empty()
@@ -658,6 +663,8 @@ $("body").delegate('#list-img', 'click', function () {
     var d_elem = GenerateModelParameterDiv("Steps", steps)
     parameters_elem.append(d_elem)
 
+    var job_id = $('#job_id_span').text()
+    localStorage.setItem("job_id", job_id);
     localStorage.setItem("width", width);
     localStorage.setItem("height", height);
     localStorage.setItem("random_seed", random_seed);
@@ -667,6 +674,33 @@ $("body").delegate('#list-img', 'click', function () {
     localStorage.setItem("steps", steps);
     localStorage.setItem("n_samples", n_samples);
     localStorage.setItem("sampler", sampler);
+
+
+    // check whether image is favorite
+    if (IsLogin()) {
+        var image_id = $('#image_id_span').text()
+        post_data = {
+            "image_id": image_id,
+        }
+        $.post("/isFavorite", post_data, function (data) {
+            try {
+                if (data["message"] == "success") {
+                    if (data["data"]["is_fav"] == true) {
+                        $('#span_fav').removeClass("bi-heart bi-heart-fill")
+                        $('#span_fav').addClass("bi-heart-fill")
+                    } else {
+                        $('#span_fav').removeClass("bi-heart bi-heart-fill")
+                        $('#span_fav').addClass("bi-heart")
+                    }
+                }
+            } catch (error) {
+                console.log(error)
+            }
+        })
+    } else {
+        $('#span_fav').removeClass("bi-heart bi-heart-fill")
+        $('#span_fav').addClass("bi-heart")
+    }
 
     $("#imageDetailModal").modal("show")
 });
@@ -688,40 +722,44 @@ $("body").delegate('#modal_copy', 'click', function () {
 $("body").delegate('#modal_favorite', 'click', function () {
     var image_id = $('#image_id_span').text()
     var class_name = $('#span_fav').attr("class")
-    $('#span_fav').removeClass("bi-heart bi-heart-fill")
-    if (class_name == "bi bi-heart") {
-        $('#span_fav').addClass("bi-heart-fill")
-        post_data = {
-            "image_id": image_id,
-            "is_fav": true
-        }
-        $.post("/favorite", post_data, function (data) {
-            try {
-                if (data["message"] == "success") {
-                    $('#span_fav').addClass("bi-heart-fill")
-                } else {
-                    alert(data["message"])
-                }
-            } catch (error) {
-                console.log(error)
+    if (IsLogin()) {
+        if (class_name == "bi bi-heart") {
+            post_data = {
+                "image_id": image_id,
+                "is_fav": true
             }
-        })
+            $.post("/favorite", post_data, function (data) {
+                try {
+                    if (data["message"] == "success") {
+                        $('#span_fav').removeClass("bi-heart bi-heart-fill")
+                        $('#span_fav').addClass("bi-heart-fill")
+                    } else {
+                        alert(data["message"])
+                    }
+                } catch (error) {
+                    console.log(error)
+                }
+            })
+        } else {
+            post_data = {
+                "image_id": image_id,
+                "is_fav": false
+            }
+            $.post("/favorite", post_data, function (data) {
+                try {
+                    if (data["message"] == "success") {
+                        $('#span_fav').removeClass("bi-heart bi-heart-fill")
+                        $('#span_fav').addClass("bi-heart")
+                    } else {
+                        alert(data["message"])
+                    }
+                } catch (error) {
+                    console.log(error)
+                }
+            })
+        }
     } else {
-        post_data = {
-            "image_id": image_id,
-            "is_fav": false
-        }
-        $.post("/favorite", post_data, function (data) {
-            try {
-                if (data["message"] == "success") {
-                    $('#span_fav').addClass("bi-heart")
-                } else {
-                    alert(data["message"])
-                }
-            } catch (error) {
-                console.log(error)
-            }
-        })
+        $("#loginModal").modal("show")
     }
 })
 
@@ -744,15 +782,19 @@ function CopyTextromModal(text) {
 
 function GetInfoFromLocalStorage() {
     job_id = localStorage.getItem("job_id");
-    width = localStorage.getItem("width");
-    height = localStorage.getItem("height");
-    random_seed = localStorage.getItem("random_seed");
-    negative_prompt = localStorage.getItem("negative_prompt");
-    prompt_str = localStorage.getItem("prompt");
-    guidance_scale = localStorage.getItem("guidance_scale");
-    steps = localStorage.getItem("steps");
-    n_samples = localStorage.getItem("n_samples");
-    sampler = localStorage.getItem("sampler");
+    if (job_id == null) {
+        Init()
+    } else {
+        width = localStorage.getItem("width");
+        height = localStorage.getItem("height");
+        random_seed = localStorage.getItem("random_seed");
+        negative_prompt = localStorage.getItem("negative_prompt");
+        prompt_str = localStorage.getItem("prompt");
+        guidance_scale = localStorage.getItem("guidance_scale");
+        steps = localStorage.getItem("steps");
+        n_samples = localStorage.getItem("n_samples");
+        sampler = localStorage.getItem("sampler");
+    }
 }
 
 function LoginUserNav(user_name, user_id) {
