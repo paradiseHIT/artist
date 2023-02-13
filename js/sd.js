@@ -582,12 +582,6 @@ function ShortenString(input_str, max_len) {
     }
 }
 
-$("body").delegate('.img-thumbnail', 'mouseover', function () {
-    var this_job_id = $($(this).parents('div').children('#j_span')).text()
-    QueryOnce(this_job_id)
-
-})
-
 function GenerateModelParameterDiv(title, text) {
     var d_elem = $("<div></div>")
     d_elem.addClass('row mb-1')
@@ -620,6 +614,9 @@ $("body").delegate('#list-img', 'click', function () {
     $('.modal-image').empty();
     $('#modal-prompt').empty();
     $('#modal-parameters').empty();
+
+    var this_job_id = $($(this).parents('div').children('#j_span')).text()
+    QueryOnce(this_job_id)
 
     var img_elem = $(this).clone()
     img_elem.removeClass("img-thumbnail")
