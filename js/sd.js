@@ -694,6 +694,8 @@ $("body").delegate('#list-img', 'click', function () {
                     }
                 }
             } catch (error) {
+                $('#span_fav').removeClass("bi-heart bi-heart-fill")
+                $('#span_fav').addClass("bi-heart")
                 console.log(error)
             }
         })
