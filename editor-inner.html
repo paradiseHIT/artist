@@ -1,8 +1,8 @@
 <!--
  * @Author: xing paradisehit@gmil.com
  * @Date: 2022-11-26 15:44:34
- * @LastEditors: xing paradisehit@gmail.com
- * @LastEditTime: 2023-02-11 20:02:39
+ * @LastEditors: 叔宝 shubao.sx@alibaba-inc.com
+ * @LastEditTime: 2023-02-13 22:40:37
  * @FilePath: /web/editor-inner.html
  * @Description:生成图片
 -->
@@ -141,30 +141,68 @@
             aria-labelledby="imageDetailModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-xl">
                 <div class="modal-content  modal_dark">
+                    <div class="modal-header modal_text">
+                        <h5 class="modal-title">Image details</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close">
+                        </button>
+                    </div>
                     <div class="container-fluid mb-3 mt-4">
-                        <div class="col-md-12">
-                            <div class="row modal_img">
-                                <div class="modal-image">
-                                    modal-image
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="row prompt_bg mb-3">
+                                    <div id="modal-prompt">
+                                    </div>
+                                    <div class="row mt-3">
+                                        <div class="modal_text col-sm-6">
+                                            <div class="btn btn-secondary col-center-block" id="modal_copy">
+                                                <span class="bi bi-clipboard2"></span>
+                                                copy prompt
+                                            </div>
+                                        </div>
+                                        <div class="modal_text col-sm-6">
+                                            <div class="btn btn-secondary  col-center-block" id="modal_favorite">
+                                                <span class="bi bi-heart" id="span_fav"></span>
+                                                favorite
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="row ml-3">
+                                    <div class="col">
+                                        <div class="btn btn-secondary col-sm-12" id="modal-editor"><span
+                                                class="bi bi-pencil-square"></span>Open in editor</div>
+                                    </div>
+                                </div>
+                                <div class="row" id="modal-parameters">
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="row modal_img">
+                                    <div class="modal-image">
+                                        modal-image
+                                    </div>
+
                                 </div>
                             </div>
                         </div>
                         <div class="row modal_text">
-                            <div class="btn btn-secondary col-sm-4  mx-auto" id="modal-close">
+                            <div class="btn btn-secondary col-sm-2 col-xs-2 mx-auto col-center-block" id="modal-close">
                                 <span class="bi bi-x-circle"></span>
                                 Close
                             </div>
                         </div>
                         <!-- </div>
-                           <div class="row">
-                               <div class="modal-footer">
-                               </div>
-                           </div> -->
+                        <div class="row">
+                            <div class="modal-footer">
+                            </div>
+                        </div> -->
                     </div><!-- /.modal-content -->
                 </div><!-- /.modal -->
             </div>
         </div>
-
         <!-- 注册模态框（Modal） -->
         <div class="modal fade" id="registerModal" tabindex="-1" role="dialog" aria-labelledby="registerModalLabel"
             aria-hidden="true">
@@ -172,9 +210,9 @@
                 <div class="modal-content modal_dark">
                     <div class="container-fluid">
                         <form id="registerForm" class="form-signin" action="#">
-                            <img class="mb-4" src="https://getbootstrap.com/docs/4.0/assets/brand/bootstrap-solid.svg"
-                                alt="" width="72" height="72">
-                            <h1 class="h3 mb-3 font-weight-normal">register</h1>
+                            <img class="mb-4 col-center-block" src="images/android-chrome-108x108.png" alt="" width="72"
+                                height="72">
+                            <h1 class="h3 mb-3 text-center font-weight-normal">register</h1>
                             <input name="username" id="register_username" class="form-control mb-3"
                                 placeholder="username" required autofocus>
                             <input name="password" type="password" id="register_password" class="form-control mb-3"
@@ -196,15 +234,15 @@
                 <div class="modal-content modal_dark">
                     <div class="container-fluid">
                         <form id="loginForm" class="form-signin" action="#">
-                            <img class="mb-4" src="https://getbootstrap.com/docs/4.0/assets/brand/bootstrap-solid.svg"
-                                alt="" width="72" height="72">
-                            <h1 class="h3 mb-3 font-weight-normal">login</h1>
+                            <img class="mb-4 col-center-block" src="images/android-chrome-108x108.png" alt="" width="72"
+                                height="72">
+                            <h1 class="h3 mb-3 text-center font-weight-normal">login</h1>
                             <input name="username" id="login_username" class="form-control mb-3" placeholder="username"
                                 required autofocus>
                             <input name="password" type="password" id="login_password" class="form-control mb-3"
                                 placeholder="password" required>
                             <div class="row text-center">
-                                <span id="user_passwd_error" class="text-danger text-center d-none"></span>
+                                <span id="user_passwd_error" class="text-danger text-center d-none mb-3"></span>
                             </div>
                             <button id="login_btn" class="btn btn-primary col-center-block" type="button">Login</button>
                         </form>
