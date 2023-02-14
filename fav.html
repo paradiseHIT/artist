@@ -1,9 +1,9 @@
 <!--
  * @Author: xing paradisehit@gmil.com
  * @Date: 2022-11-26 15:44:34
- * @LastEditors: 叔宝 shubao.sx@alibaba-inc.com
- * @LastEditTime: 2023-02-13 22:31:12
- * @FilePath: /web/my.html
+ * @LastEditors: xing paradisehit@gmail.com
+ * @LastEditTime: 2023-02-14 22:47:06
+ * @FilePath: /web/favorite.html
  * @Description:生成图片
 -->
 <!doctype html>
@@ -40,9 +40,10 @@
                         Home
                     </button>
                     <ul class="dropdown-menu dropdown_dark" aria-labelledby="dropdownMenuButton">
-                        <li><a class="dropdown-item modal_text" id="user_div" href="my.html">
+                        <li><a class="dropdown-item modal_text" id="user_div" href="home.html">
                                 <span>MyImages</span></a></li>
-                        <li><a class="dropdown-item modal_text" href="editor.html">GoToCreate</a></li>
+                        <li><a class="dropdown-item modal_text" href="editor.html">Create</a></li>
+                        <li><a class="dropdown-item modal_text" href="favorite.html">Favorites</a></li>
                         <li><a class="dropdown-item modal_text" id="logout" href="#">Logout</a></li>
                     </ul>
                 </div>
@@ -194,7 +195,7 @@
 <script type="text/javascript" src="js/sd.js"></script>
 <script type="text/javascript">
     var is_my = true
-    $(document).ready(InitLoadMyPage)
+    $(document).ready(LoadMyFavoritesPage)
     $(window).scroll(ScrollPage)
 </script>
 

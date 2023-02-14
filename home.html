@@ -2,8 +2,8 @@
  * @Author: xing paradisehit@gmil.com
  * @Date: 2022-11-26 15:44:34
  * @LastEditors: xing paradisehit@gmail.com
- * @LastEditTime: 2023-02-14 22:51:49
- * @FilePath: /web/editor.html
+ * @LastEditTime: 2023-02-14 22:51:13
+ * @FilePath: /web/home.html
  * @Description:生成图片
 -->
 <!doctype html>
@@ -17,6 +17,7 @@
     <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <link href="css/sd.css" rel="stylesheet">
+    <link rel="shortcut icon" href="./favicon.ico" type="image/x-icon">
 </head>
 
 <body>
@@ -48,83 +49,24 @@
                 </div>
             </div>
             <div class="intro">
-                <h2 class="text-center">Prompts Database</h2>
-            </div>
-            <div class="row g-3 align-items-center">
-
-                <div class="input-group mb-3 ">
-                    <span class="input-group-text">Prompt</span>
-                    <textarea id="prompt" class="form-control" aria-label="Prompt" rows="3"
-                        placeholder="a photo of an astronaut riding a horse on mars"></textarea>
+                <div class="col-sm-6 col-center-block">
+                    <h2 class="text-center">Prompts Database</h2>
                 </div>
             </div>
             <div class="row g-3 align-items-center">
-
-                <div class="input-group  mb-3">
-                    <span class="input-group-text">Negative Prompt</span>
-                    <textarea id="negative_prompt" class="form-control" aria-label="NegPrompt" rows="2"
-                        placeholder=""></textarea>
+                <div class="col-sm-6 col-center-block mb-3">
+                    <input type="text" class="form-control " id="search_words" aria-describedby="Search"
+                        placeholder="Search My AI images">
                 </div>
             </div>
             <div class="row g-3 align-items-center">
-                <div class="input-group mb-3">
-                    <span class="input-group-text" id="width1">Width</span>
-                    <input type="text" class="form-control" id="width" aria-describedby="width1"
-                        placeholder="default 768"></input>
 
-                    <span class="input-group-text" id="height1">Height</span>
-                    <input type="text" class="form-control" id="height" aria-describedby="height1"
-                        placeholder="default 768"></input>
-
-                    <span class="input-group-text" id="random_seed1">Random seed</span>
-                    <input type="text" class="form-control" id="random_seed" aria-describedby="random_seed"
-                        placeholder="default 42"></input>
-
-
-                    <span class="input-group-text" id="n_samples1">Samples</span>
-                    <input type="text" class="form-control" id="n_samples" aria-describedby="n_samples1"
-                        placeholder="default 8"></input>
-
-                </div>
-            </div>
-            <div class="row g-3 align-items-center">
-                <div class="input-group mb-3">
-                    <span for="guidance_scale1" class="input-group-text" style="width: 150px;">Guidance
-                        Scale</span>
-                    <span class="input-group-text" id="guidance_scale_show" style="width: 50px;">7.5</span>
-                    <div class="col-sm-6 col-lg-6">
-                        <input type="range" class="form-range" min="0" max="30" step="0.5" value="7.5"
-                            id="guidance_scale" oninput="GuidanceScaleChange()" aria-describedby="guidance_scale1">
-                    </div>
-                </div>
-            </div>
-            <div class="row g-3 align-items-center">
-                <div class="input-group mb-3">
-                    <span class="input-group-text" id="steps1" style="width: 150px;">Steps</span>
-                    <span class="input-group-text" id="steps_show" style="width: 50px;">50</span>
-                    <div class="col-sm-6 col-md-7 col-lg-6">
-                        <input type="range" class="form-range" min="10" max="200" step="1" value="50" id="steps"
-                            oninput="StepsChange()" aria-describedby="steps1">
-                    </div>
+                <div class="col-sm-6 col-center-block mb-3">
+                    <input name="" id="my_search_btn" class="btn btn-primary col-center-block" type="button"
+                        value="My Search">
                 </div>
             </div>
 
-            <div class="row lg-3 align-items-center">
-                <div class="input-group mb-3">
-                    <span class="input-group-text" id="sampler1" style="width: 150px;">Sampler</span>
-                    <div class="col-s-2">
-                        <select class="form-control" style="width:auto;" id="sampler">
-                            <option value="ddim" selected>ddim</option>
-                            <option value="plms">plms</option>
-                            <option value="dmp">dmp</option>
-                            <option value="euler_a">euler_a</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-            <div class="mb-3" style="text-align:center">
-                <input name="" id="generate_btn" class="btn btn-primary" type="button" value="Generate">
-            </div>
             <div id="queue_div">
             </div>
             <div id="row_div" class="row photos">
@@ -250,14 +192,11 @@
 <script src="jquery/jquery-3.6.1.min.js"></script>
 <script src="bootstrap/js/bootstrap.bundle.min.js"></script>
 <script type="text/javascript" src="js/md5.min.js"></script>
-<script src="js/sd.js"></script>
+<script type="text/javascript" src="js/sd.js"></script>
 <script type="text/javascript">
-    $(document).ready(function () {
-        ShowNav()
-        GetInfoFromLocalStorage()
-        DisplayQueryInfo()
-    })
+    var is_my = true
+    $(document).ready(InitLoadMyPage)
+    $(window).scroll(ScrollPage)
 </script>
-
 
 </html>

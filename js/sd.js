@@ -127,6 +127,21 @@ function InitLoadMyPage() {
         }
     }
 }
+function LoadMyFavoritesPage() {
+    ShowNav()
+    if (!IsLogin()) {
+        $("#loginModal").modal("show")
+    } else {
+        page_num = 1
+        for (start_page_num = 1; page_num < start_page_num + 1; page_num++) {
+            var continued = LoadMyFavoriteImages(page_num)
+            if (continued == false) {
+                break
+            }
+
+        }
+    }
+}
 
 function ScrollPage() {
     var scrollTop = $(this).scrollTop(); //scroll to top's height
@@ -557,16 +572,48 @@ function LoadGeneratedImages(page_num, is_my) {
     return can_continue
 }
 
-function ShowImages(image_details) {
+function LoadMyFavoriteImages(page_num) {
+    var can_continue = true
+    post_data = {
+        "page_num": page_num,
+        "page_size": PAGE_SIZE
+    }
+    $.post("/favoriteImages", post_data, function (mydata) {
+        try {
+            if (mydata.hasOwnProperty("data")) {
+                image_details = mydata["data"]["result"]
+                if (image_details.length > 0) {
+                    ShowImages(image_details, false)
+                } else {
+                    can_continue = false
+                }
+            } else {
+                can_continue = false
+            }
+        }
+        catch (error) {
+            console.log(error)
+            can_continue = false
+        }
+    })
+    return can_continue
+}
+
+function ShowImages(image_details, index = true) {
     image_urls = []
     prompts = []
     job_ids = []
     image_ids = []
     for (var i = 0; i < image_details.length; i++) {
-        image_urls.push(image_details[i]["cover_image_url"])
+        if (index) {
+            image_ids.push(image_details[i]["cover_image_id"])
+            image_urls.push(image_details[i]["cover_image_url"])
+        } else {
+            image_ids.push(image_details[i]["image_id"])
+            image_urls.push(image_details[i]["image_url"])
+        }
         prompts.push(image_details[i]["prompt"])
         job_ids.push(image_details[i]["job_id"])
-        image_ids.push(image_details[i]["cover_image_id"])
     }
     UpdateImages(image_urls, prompts, job_ids, image_ids)
 }
@@ -590,20 +637,6 @@ function GenerateModelParameterDiv(title, text) {
     text_elem.append(text)
     d_elem.append(title_elem)
     d_elem.append(text_elem)
-    return d_elem
-}
-
-function GenerateEditorDiv(editor_str) {
-    var d_elem = $("<div></div>")
-    d_elem.addClass('row')
-    var btn_elem = $("<div></div>")
-    var s_elem = $("<span></span>")
-    s_elem.addClass("bi bi-pencil-square")
-    btn_elem.addClass("btn btn-secondary col-sm-8")
-    btn_elem.attr("id", "modal-editor")
-    btn_elem.append(s_elem)
-    btn_elem.append(editor_str)
-    d_elem.append(btn_elem)
     return d_elem
 }
 
