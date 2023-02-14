@@ -446,17 +446,14 @@ function ParseResult(mydata) {
 }
 
 function QueryOnce(job_id) {
-    var data = { "job_id": parseInt(job_id) }
-    fetch(protocol + "://" + host + "/query", {
-        method: "POST",
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-    }).then(response => {
-        return response.json()
-    }).then(mydata => {
-        ParseResult(mydata)
-    });
-
+    var post_data = { "job_id": parseInt(job_id) }
+    $.post("/query", post_data, function (mydata) {
+        try {
+            ParseResult(mydata)
+        } catch (error) {
+            console.log(error)
+        }
+    })
 }
 
 function Generate(async) {
@@ -624,10 +621,10 @@ $("body").delegate('#list-img', 'click', function () {
     img_elem.addClass("modal_img")
     var model_image = $(".modal-image")
     model_image.append(img_elem)
-    var txt_elem = $($(this).parents('div').children('#l_span')).clone()
-    txt_elem.removeAttr("style")
-    txt_elem.attr("id", "l_span_prompt")
-    txt_elem.show()
+
+    var prompt_elem = $("<span>" + prompt_str + "</span>")
+    prompt_elem.attr("id", "l_span_prompt")
+
     var job_id_elem = $($(this).parents('div').children('#j_span')).clone()
     job_id_elem.removeAttr("style")
     job_id_elem.attr("id", "job_id_span")
@@ -637,7 +634,7 @@ $("body").delegate('#list-img', 'click', function () {
     image_id_elem.attr("id", "image_id_span")
     image_id_elem.hide()
     var model_text = $("#modal-prompt")
-    model_text.append(txt_elem)
+    model_text.append(prompt_elem)
     model_text.append(job_id_elem)
     model_text.append(image_id_elem)
     var btn_elem = $("#modal_copy")
