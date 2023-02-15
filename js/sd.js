@@ -1034,6 +1034,8 @@ function ShowNav() {
                 user_name = mydata["data"]["user_name"]
                 user_id = mydata["data"]["user_id"]
                 LoginUserNav(user_name, user_id)
+
+                document.getElementById('dropdownMenuButton').innerHTML = user_name + "'s Home"
             } else {
                 NotLoginUserNav()
             }
