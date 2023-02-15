@@ -187,25 +187,39 @@ function ScrollPage() {
         }
     }
 }
-
 function IsLogin() {
-    $.ajaxSettings.async = false;
-    var is_login = false
+    login_info = CheckLogin()
+    if (login_info.hasOwnProperty("is_login")) {
+        return login_info["is_login"]
+    } else {
+        return false
+    }
+}
+
+function IsAdmin() {
+    login_info = CheckLogin()
+    if (login_info.hasOwnProperty("is_admin")) {
+        return login_info["is_admin"]
+    } else {
+        return false
+    }
+}
+
+function CheckLogin() {
+    var login_info
     $.get("/checkLogin", function (data) {
         try {
             if (data.hasOwnProperty("data")) {
-                if (data["data"]["is_login"] == true) {
-                    is_login = true
-                }
+                login_info = data["data"]
             } else {
-                is_login = false
+                login_info["is_login"] = false
             }
         } catch (error) {
             console.log(error)
-            is_login = false
+            login_info["is_login"] = false
         }
     })
-    return is_login
+    return login_info
 }
 
 function Init() {
@@ -730,17 +744,61 @@ $("body").delegate('#list-img', 'click', function () {
     localStorage.setItem("n_samples", n_samples);
     localStorage.setItem("sampler", sampler);
 
-
     // check whether image is favorite
     if (IsLogin()) {
         var image_id = $('#image_id_span').text()
         post_data = {
             "image_id": image_id,
         }
-        $.post("/isFavorite", post_data, function (data) {
-            try {
-                if (data["message"] == "success") {
-                    if (data["data"]["is_fav"] == true) {
+        if (IsAdmin()) {
+            var ban_elem = $("#modal_ban")
+            ban_elem.removeClass("d-none")
+            $.ajax({
+                type: "post",
+                url: "/isBan",
+                data: post_data,
+                dataType: "json",
+                async: true,
+                crossDomain: true,
+                success: function (ret_data) {
+                    if (ret_data["message"] == "success") {
+                        if (ret_data["data"]["is_ban"] == true) {
+                            $('#span_ban').removeClass("bi-eye bi-eye-slash")
+                            $('#span_ban').addClass("bi-eye-slash")
+                        } else {
+                            $('#span_ban').removeClass("bi-eye bi-eye-slash")
+                            $('#span_ban').addClass("bi-eye")
+                        }
+                    }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    console.warn(XMLHttpRequest.status);
+                    console.warn(XMLHttpRequest.readyState);
+                    console.warn(textStatus);
+                },
+                complete: function (XMLHttpRequest, textStatus) {
+                    if (XMLHttpRequest.status != 200) {
+                        console.warn("request complete:" + XMLHttpRequest.status);
+                    }
+                }
+            }).fail(function (ret_data) {
+                $('#span_ban').removeClass("bi-eye bi-eye-slash")
+                $('#span_ban').addClass("bi-eye")
+                console.log("fail")
+                console.log(ret_data["code"])
+                console.log(ret_data)
+            })
+        }
+        $.ajax({
+            type: "post",
+            url: "/isFavorite",
+            data: post_data,
+            dataType: "json",
+            async: true,
+            crossDomain: true,
+            success: function (ret_data) {
+                if (ret_data["message"] == "success") {
+                    if (ret_data["data"]["is_fav"] == true) {
                         $('#span_fav').removeClass("bi-heart bi-heart-fill")
                         $('#span_fav').addClass("bi-heart-fill")
                     } else {
@@ -748,12 +806,43 @@ $("body").delegate('#list-img', 'click', function () {
                         $('#span_fav').addClass("bi-heart")
                     }
                 }
-            } catch (error) {
-                $('#span_fav').removeClass("bi-heart bi-heart-fill")
-                $('#span_fav').addClass("bi-heart")
-                console.log(error)
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                console.warn(XMLHttpRequest.status);
+                console.warn(XMLHttpRequest.readyState);
+                console.warn(textStatus);
+            },
+            complete: function (XMLHttpRequest, textStatus) {
+                if (XMLHttpRequest.status != 200) {
+                    console.warn("request complete:" + XMLHttpRequest.status);
+                }
             }
+        }).fail(function (ret_data) {
+            $('#span_fav').removeClass("bi-heart bi-heart-fill")
+            $('#span_fav').addClass("bi-heart")
+            console.log("fail")
+            console.log(ret_data["code"])
+            console.log(ret_data)
         })
+
+
+        // $.post("/isFavorite", post_data, function (data) {
+        //     try {
+        //         if (data["message"] == "success") {
+        //             if (data["data"]["is_fav"] == true) {
+        //                 $('#span_fav').removeClass("bi-heart bi-heart-fill")
+        //                 $('#span_fav').addClass("bi-heart-fill")
+        //             } else {
+        //                 $('#span_fav').removeClass("bi-heart bi-heart-fill")
+        //                 $('#span_fav').addClass("bi-heart")
+        //             }
+        //         }
+        //     } catch (error) {
+        //         $('#span_fav').removeClass("bi-heart bi-heart-fill")
+        //         $('#span_fav').addClass("bi-heart")
+        //         console.log(error)
+        //     }
+        // })
     } else {
         $('#span_fav').removeClass("bi-heart bi-heart-fill")
         $('#span_fav').addClass("bi-heart")
@@ -771,9 +860,52 @@ $("body").delegate('#modal-editor', 'click', function () {
 
 $("body").delegate('#modal_copy', 'click', function () {
     $('#modal_copy').empty();
-    $('#modal_copy').append("<span class='bi bi-clipboard2-check'></span> copied")
     var txt = $('#l_span_prompt').text()
     CopyTextromModal(txt)
+    $('#modal_copy').append("<span class='bi bi-clipboard2-check'>copied</span>")
+})
+$("body").delegate('#modal_ban', 'click', function () {
+    var image_id = $('#image_id_span').text()
+    var class_name = $('#span_ban').attr("class")
+    if (IsAdmin()) {
+        if (class_name == "bi bi-eye") {
+            post_data = {
+                "image_id": image_id,
+                "is_ban": true
+            }
+            $.post("/ban", post_data, function (data) {
+                try {
+                    if (data["message"] == "success") {
+                        $('#span_ban').removeClass("bi-eye bi-eye-slash")
+                        $('#span_ban').addClass("bi-eye-slash")
+                    } else {
+                        alert(data["message"])
+                    }
+                } catch (error) {
+                    console.log(error)
+                }
+            })
+        } else {
+            post_data = {
+                "image_id": image_id,
+                "is_ban": false
+            }
+            $.post("/ban", post_data, function (data) {
+                try {
+                    if (data["message"] == "success") {
+                        $('#span_ban').removeClass("bi-eye bi-eye-slash")
+                        $('#span_ban').addClass("bi-eye")
+                    } else {
+                        alert(data["message"])
+                    }
+                } catch (error) {
+                    console.log(error)
+                }
+            })
+        }
+    } else {
+        $("#loginModal").modal("show")
+    }
 })
 
 $("body").delegate('#modal_favorite', 'click', function () {
