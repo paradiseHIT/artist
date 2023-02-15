@@ -34,21 +34,45 @@ if (host != "127.0.0.1") {
     protocol = "https"
 }
 $.ajaxSettings.async = false;
+if (document.getElementById("search_words") != null) {
+    document.getElementById("search_words").addEventListener('keydown', function (event) {
+        if (event.code == 'Enter') {
+            $("#search_btn").click()
+        }
+    })
+}
+if (document.getElementById("my_search_words") != null) {
+    document.getElementById("my_search_words").addEventListener('keydown', function (event) {
+        if (event.code == 'Enter') {
+            $("#my_search_btn").click()
+        }
+    })
+}
+if (document.getElementById("my_fav_search_words") != null) {
+    document.getElementById("my_fav_search_words").addEventListener('keydown', function (event) {
+        if (event.code == 'Enter') {
+            $("#my_fav_search_btn").click()
+        }
+    })
+}
 
-$("#search_btn").click(function () {
+$("#search_btn").click(SearchIndex)
+
+function SearchByPrompt(is_my) {
     Init()
     search_words = $("#search_words").val()
     EmptyDisplay()
-    Search(search_words, page_num)
+    Search(search_words, page_num, is_my)
     page_num++
-})
-$("#my_search_btn").click(function () {
-    Init()
-    search_words = $("#search_words").val()
-    EmptyDisplay()
-    Search(search_words, page_num, true)
-    page_num++
-})
+}
+function SearchIndex() {
+    SearchByPrompt(false)
+}
+function SearchMy() {
+    SearchByPrompt(true)
+}
+
+$("#my_search_btn").click(SearchMy)
 
 $("#query_btn").click(function () {
     job_id = $("#job_id").val()
@@ -523,7 +547,7 @@ window.document.documentElement.setAttribute("data-theme", "dark");
 function Search(search_words, page_num, is_my) {
     is_search = true
     url = "/search?page_size=" + SEARCH_PAGE_SIZE + "&page_num=" + page_num + "&search_words=" + search_words
-    if (is_my) {
+    if (is_my == true) {
         url += "&is_my=true"
     }
     var can_continue = true
