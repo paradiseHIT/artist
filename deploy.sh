@@ -3,7 +3,7 @@
  # @Author: xing paradisehit@gmail.com
  # @Date: 2023-02-10 00:13:37
  # @LastEditors: xing paradisehit@gmail.com
- # @LastEditTime: 2023-02-14 23:15:35
+ # @LastEditTime: 2023-02-16 02:03:50
  # @FilePath: /web/deploy.sh
  # @Description: deploy on server
  # Copyright (c) 2023 by xing shi email: paradisehit@gmail.com, All Rights Reserved.
@@ -14,5 +14,4 @@ echo $WORK_DIR
 git pull
 sudo cp $WORK_DIR/* -R /usr/share/nginx/html/artist/
 #https://obfuscator.io/
-sudo cp /usr/share/nginx/html/artist/sde.js /usr/share/nginx/html/artist/sd.js 
 sudo chown -R nginx:nginx /usr/share/nginx/html/artist/
