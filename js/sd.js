@@ -60,7 +60,11 @@ $("#search_btn").click(SearchIndex)
 
 function SearchByPrompt(is_my) {
     Init()
-    search_words = $("#search_words").val()
+    if (is_my) {
+        search_words = $("#my_search_words").val()
+    } else {
+        search_words = $("#search_words").val()
+    }
     EmptyDisplay()
     Search(search_words, page_num, is_my)
     page_num++
@@ -241,7 +245,7 @@ function GenerateInitilize() {
         $("#steps").val(steps)
     }
     if ($("#n_samples").val() == "" || $("#n_samples").val() == 0) {
-        n_samples = 8
+        n_samples = 6
         $("#n_samples").val(n_samples)
     }
     if ($("#guidance_scale").val() == "" || $("#guidance_scale").val() == 0) {
