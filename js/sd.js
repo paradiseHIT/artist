@@ -434,14 +434,17 @@ function ShowQueryResult(mydata, is_show) {
                     DisplayInProgress(query_times++)
                 } else if (state == 2) {
                     ShowImages(image_details, false)
+                    clearInterval(query_interval_id)
                 } else if (state == 3) {
                     DisplayError()
+                    clearInterval(query_interval_id)
                 }
             }
         } else if (code == JOB_NOT_EXISTS_ERROR) {
             console.log(JOB_NOT_EXISTS_ERROR + ":" + job_id)
             if (is_show == true) {
                 DisplayJobNotExists(job_id)
+                clearInterval(query_interval_id)
             }
         }
     } catch (error) {
@@ -450,6 +453,7 @@ function ShowQueryResult(mydata, is_show) {
         console.log(error)
         if (is_show == true) {
             DisplayError()
+            clearInterval(query_interval_id)
         }
     }
 }
