@@ -97,8 +97,7 @@ $("#generate_btn").click(function () {
             $("#prompt").focus()
         } else {
             GenerateInitilize()
-            async = false
-            job_id = Generate(async)
+            job_id = Generate()
             if (job_id != undefined) {
                 if (query_interval_id != undefined) {
                     clearInterval(query_interval_id)
@@ -237,10 +236,16 @@ function GenerateInitilize() {
     if ($("#width").val() == "" || $("#width").val() == 0) {
         width = 512
         $("#width").val(width)
+    } else if ($("#width").val() % 8 != 0) {
+        temp = parseInt($("#width").val() / 8)
+        $("#width").val(temp * 8)
     }
     if ($("#height").val() == "" || $("#height").val() == 0) {
         height = 512
         $("#height").val(height)
+    } else if ($("#height").val() % 8 != 0) {
+        temp = parseInt($("#height").val() / 8)
+        $("#height").val(temp * 8)
     }
     if ($("#steps").val() == "" || $("#steps").val() == 0) {
         steps = 50
@@ -469,7 +474,7 @@ function QueryOnce(job_id, is_show) {
     })
 }
 
-function Generate(async) {
+function Generate() {
     var job_id
     var post_data = {
         "width": $("#width").val(),
@@ -496,29 +501,6 @@ function Generate(async) {
             console.log(mydata)
         }
     })
-    // $.ajax({
-    //     type: "post",//request id
-    //     url: protocol + "://" + host + "/generate",
-    //     data: post_data,
-    //     //if no param needed, do not set
-    //     dataType: "json",
-    //     async: async,
-    //     crossDomain: true,
-    //     //请求成功时调用的函数
-    //     success: function (mydata) {
-    //         var request_id = mydata["request_id"]
-    //         var code = mydata["code"]
-    //         if (code != "OK") {
-    //             console.warn(request_id + " failed")
-    //             return
-    //         }
-    //         job_id = mydata["data"]["job_id"]
-    //         queue_len = mydata["data"]["queue_len"]
-    //     }
-    // }).fail(function (mydata) {
-    //     console.log("failed")
-    //     console.log(mydata)
-    // })
     return job_id
 }
 
