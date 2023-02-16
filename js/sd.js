@@ -85,19 +85,8 @@ $("#query_btn").click(function () {
     if (job_id == 0 || !reg.test(job_id)) {
         $("#job_id").val("please input job id")
     } else {
-        //初始化
-        //ajax同步获取数据
         Init()
-        async = false
-        if (query_interval_id != undefined) {
-            clearInterval(query_interval_id)
-        }
-
-        QueryOnce(job_id)
-        //每隔x秒查一次
-        var x = 1000
-        query_interval_id = setInterval("QueryAndUpdate(" + job_id + ")", x);
-
+        QueryOnce(job_id, true)
     }
 })
 
@@ -114,10 +103,9 @@ $("#generate_btn").click(function () {
                 if (query_interval_id != undefined) {
                     clearInterval(query_interval_id)
                 }
-
-                QueryAndUpdate(job_id)
+                QueryOnce(job_id, true)
                 var x = 1000
-                query_interval_id = setInterval("QueryAndUpdate(" + job_id + ")", x);
+                query_interval_id = setInterval("QueryOnce(" + job_id + ", true)", x);
             } else {
                 DisplayError()
             }
@@ -247,11 +235,11 @@ function Init() {
 function GenerateInitilize() {
     Init()
     if ($("#width").val() == "" || $("#width").val() == 0) {
-        width = 768
+        width = 512
         $("#width").val(width)
     }
     if ($("#height").val() == "" || $("#height").val() == 0) {
-        height = 768
+        height = 512
         $("#height").val(height)
     }
     if ($("#steps").val() == "" || $("#steps").val() == 0) {
@@ -367,30 +355,6 @@ function UpdateElementValue(element, value) {
     }
 
 }
-
-function UpdateEditorImages(image_urls, job_id) {
-    var row_photos = $("#row_div")
-    for (var i = 0; i < image_urls.length; i++) {
-        var div_elem = $("<div></div>")
-        div_elem.addClass("col-sm-3 col-md-2 col-lg-2 mb-1 item")
-        div_elem.attr("align", "center")
-        var image_url = image_urls[i]
-        var a_elem = $("<a></a>")
-        a_elem.attr("data-lightbox", "photos")
-        image_elem = $("<img>")
-        image_elem.addClass("img-fluid img-thumbnail")
-        image_elem.attr("src", image_url)
-        image_elem.attr("id", "list-img")
-        a_elem.append(image_elem)
-        div_elem.append(a_elem)
-
-        var j_span_elem = $("<span>" + job_id + "</span>")
-        j_span_elem.attr("id", "j_span")
-        j_span_elem.hide()
-        div_elem.append(j_span_elem)
-        row_photos.append(div_elem)
-    }
-}
 function UpdateImages(image_urls, prompts, job_ids, image_ids) {
     var row_photos = $("#row_div")
     for (var i = 0; i < image_urls.length; i++) {
@@ -440,35 +404,10 @@ function UpdateImages(image_urls, prompts, job_ids, image_ids) {
     }
 }
 
-function Update() {
-    EmptyDisplay()
-    DisplayQueryInfo()
-    if (job_internal_error) {
-        console.log("job_internal_error")
-        clearInterval(query_interval_id)
-    } else if (job_not_exists == true) {
-        console.log("job_not_exists")
-        DisplayJobNotExists(job_id)
-        clearInterval(query_interval_id)
-    } else if (queue_len != undefined) {
-        if (state == 2 || state == 3) {
-            clearInterval(query_interval_id)
-            UpdateEditorImages(image_urls, job_id)
-        } else if (state == 1) {
-            DisplayInProgress(query_times)
-        } else {
-            DisplayQueue(queue_len)
-        }
+function ShowQueryResult(mydata, is_show) {
+    if (is_show) {
+        EmptyDisplay()
     }
-}
-
-function QueryAndUpdate(job_id) {
-    QueryOnce(job_id)
-    query_times += 1
-    Update()
-}
-
-function ParseResult(mydata) {
     try {
         var code = mydata["code"]
         if (code == CODE_OK) {
@@ -485,28 +424,41 @@ function ParseResult(mydata) {
             n_samples = mydata["data"]["result"]["n_samples"]
             job_id = mydata["data"]["result"]['job_id']
             job_not_exists = false
-            if (state == 2) {
-                var images_str = mydata["data"]["result"]["result"]
-                var obj
-                obj = JSON.parse(images_str)
-                image_urls = obj["image_urls"]
+            image_details = mydata["data"]["images"]
+
+            if (is_show == true) {
+                DisplayQueryInfo()
+                if (state == 0) {
+                    DisplayQueue(queue_len)
+                } else if (state == 1) {
+                    DisplayInProgress(query_times++)
+                } else if (state == 2) {
+                    ShowImages(image_details, false)
+                } else if (state == 3) {
+                    DisplayError()
+                }
             }
         } else if (code == JOB_NOT_EXISTS_ERROR) {
             console.log(JOB_NOT_EXISTS_ERROR + ":" + job_id)
-            job_not_exists = true
+            if (is_show == true) {
+                DisplayJobNotExists(job_id)
+            }
         }
     } catch (error) {
         job_internal_error = true
         console.log("job_internal_error")
         console.log(error)
+        if (is_show == true) {
+            DisplayError()
+        }
     }
 }
 
-function QueryOnce(job_id) {
+function QueryOnce(job_id, is_show) {
     var post_data = { "job_id": parseInt(job_id) }
     $.post("/query", post_data, function (mydata) {
         try {
-            ParseResult(mydata)
+            ShowQueryResult(mydata, is_show)
         } catch (error) {
             console.log(error)
         }
@@ -526,29 +478,43 @@ function Generate(async) {
         "n_samples": $("#n_samples").val(),
         "sampler": $("#sampler").val()
     }
-    $.ajax({
-        type: "post",//request id
-        url: protocol + "://" + host + "/generate",
-        data: post_data,
-        //if no param needed, do not set
-        dataType: "json",
-        async: async,
-        crossDomain: true,
-        //请求成功时调用的函数
-        success: function (mydata) {
+    $.post("/generate", post_data, function (mydata) {
+        try {
             var request_id = mydata["request_id"]
             var code = mydata["code"]
-            if (code != "OK") {
-                console.warn(request_id + " failed")
-                return
-            }
             job_id = mydata["data"]["job_id"]
             queue_len = mydata["data"]["queue_len"]
+            if (code != "OK") {
+                console.warn(request_id + " failed")
+            }
+        } catch (error) {
+            console.log(error)
+            console.log(mydata)
         }
-    }).fail(function (mydata) {
-        console.log("failed")
-        console.log(mydata)
     })
+    // $.ajax({
+    //     type: "post",//request id
+    //     url: protocol + "://" + host + "/generate",
+    //     data: post_data,
+    //     //if no param needed, do not set
+    //     dataType: "json",
+    //     async: async,
+    //     crossDomain: true,
+    //     //请求成功时调用的函数
+    //     success: function (mydata) {
+    //         var request_id = mydata["request_id"]
+    //         var code = mydata["code"]
+    //         if (code != "OK") {
+    //             console.warn(request_id + " failed")
+    //             return
+    //         }
+    //         job_id = mydata["data"]["job_id"]
+    //         queue_len = mydata["data"]["queue_len"]
+    //     }
+    // }).fail(function (mydata) {
+    //     console.log("failed")
+    //     console.log(mydata)
+    // })
     return job_id
 }
 
@@ -641,21 +607,21 @@ function LoadMyFavoriteImages(page_num) {
     return can_continue
 }
 
-function ShowImages(image_details, index = true) {
+function ShowImages(show_image_details, index = true) {
     image_urls = []
     prompts = []
     job_ids = []
     image_ids = []
-    for (var i = 0; i < image_details.length; i++) {
+    for (var i = 0; i < show_image_details.length; i++) {
         if (index) {
-            image_ids.push(image_details[i]["cover_image_id"])
-            image_urls.push(image_details[i]["cover_image_url"])
+            image_ids.push(show_image_details[i]["cover_image_id"])
+            image_urls.push(show_image_details[i]["cover_image_url"])
         } else {
-            image_ids.push(image_details[i]["image_id"])
-            image_urls.push(image_details[i]["image_url"])
+            image_ids.push(show_image_details[i]["image_id"])
+            image_urls.push(show_image_details[i]["image_url"])
         }
-        prompts.push(image_details[i]["prompt"])
-        job_ids.push(image_details[i]["job_id"])
+        prompts.push(show_image_details[i]["prompt"])
+        job_ids.push(show_image_details[i]["job_id"])
     }
     UpdateImages(image_urls, prompts, job_ids, image_ids)
 }
@@ -688,7 +654,7 @@ $("body").delegate('#list-img', 'click', function () {
     $('#modal-parameters').empty();
 
     var this_job_id = $($(this).parents('div').children('#j_span')).text()
-    QueryOnce(this_job_id)
+    QueryOnce(this_job_id, false)
 
     var img_elem = $(this).clone()
     img_elem.removeClass("img-thumbnail")
