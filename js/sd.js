@@ -28,6 +28,7 @@ var job_id
 var image_details = []
 var search_words = ""
 var is_search = false
+var beian = false
 var host = window.location.host
 protocol = "http"
 if (host != "127.0.0.1") {
@@ -57,6 +58,9 @@ if (document.getElementById("my_fav_search_words") != null) {
 }
 
 $("#search_btn").click(SearchIndex)
+$("#see_more").click(function () {
+    $("#login").click()
+})
 
 function SearchByPrompt(is_my) {
     Init()
@@ -158,11 +162,75 @@ function LoadMyFavoritesPage() {
     }
 }
 
+function ScrollPageIndex() {
+    if (page_num <= 3) {
+        var scrollTop = $(this).scrollTop(); //scroll to top's height
+        var scrollHeight = $(document).height(); //this pages's height
+        var clientHeight = $(this).height(); //now height
+        if (scrollTop + clientHeight >= scrollHeight - 30) {
+            var continued = true
+            if (is_search) {
+                continued = Search(search_words, page_num, is_my)
+            } else {
+                continued = LoadGeneratedImages(page_num, is_my)
+            }
+            if (continued) {
+                page_num++
+            }
+        }
+    }
+}
+
+function LimitScrollPage() {
+    if (IsLogin()) {
+        console.log("login")
+        ScrollPage()
+    } else if ((!IsLogin()) && page_num <= 3) {
+        if (page_num == 3) {
+            if (beian != true) {
+                beian_element = $("#beian")
+                beian_element.empty()
+                var a_elem = $("<a>浙ICP备2023001289号</a>")
+                a_elem.attr("href", "http://beian.miit.gov.cn")
+                a_elem.attr("target", "_blank")
+                beian_element.append(a_elem)
+                beian = true
+            }
+        } else {
+            ScrollPage()
+        }
+    } else {
+        if (beian != true) {
+            beian_element = $("#beian")
+            beian_element.empty()
+            var a_elem = $("<a>浙ICP备2023001289号</a>")
+            a_elem.attr("href", "http://beian.miit.gov.cn")
+            a_elem.attr("target", "_blank")
+            beian_element.append(a_elem)
+            beian = true
+        }
+    }
+}
+
+function IsPageBottom() {
+    var scrollTop = $(this).scrollTop(); //scroll to top's height
+    var scrollHeight = $(document).height(); //this pages's height
+    var clientHeight = $(this).height(); //now height
+    console.log("scrollTop=" + scrollTop)
+    console.log("scrollHeight=" + scrollHeight)
+    console.log("clientHeight=" + clientHeight)
+    if (clientHeight + 30 >= scrollHeight) {
+        return true
+    } else {
+        return false
+    }
+}
+
 function ScrollPage() {
     var scrollTop = $(this).scrollTop(); //scroll to top's height
     var scrollHeight = $(document).height(); //this pages's height
     var clientHeight = $(this).height(); //now height
-    if (scrollTop + clientHeight >= scrollHeight - 30) {
+    if (scrollTop + clientHeight >= scrollHeight - 20) {
         var continued = true
         if (is_search) {
             continued = Search(search_words, page_num, is_my)

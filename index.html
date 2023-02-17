@@ -2,7 +2,7 @@
  * @Author: xing paradisehit@gmil.com
  * @Date: 2022-11-26 15:44:34
  * @LastEditors: xing paradisehit@gmail.com
- * @LastEditTime: 2023-02-16 02:37:52
+ * @LastEditTime: 2023-02-17 22:31:57
  * @FilePath: /web/index.html
  * @Description:生成图片
 -->
@@ -24,23 +24,19 @@
     <div class="photo-gallery">
         <div class="container" id="main_container">
             <div id="user_nav" class="row justify-content-end">
-                <div class="col-md-1" id="login_div">
-                    <img class="mb-4 col-center-block" src="images/android-chrome-108x108.png" alt="" width="72"
-                        height="72">
-                </div>
                 <div class="d-none col-md-1" id="login_div">
                     <a href="#">
-                        <span id="login" class="text-center float-end">Login</span>
+                        <span id="login" class="text-center float-end mt-3">Login</span>
                     </a>
                 </div>
                 <div class="d-none col-md-1" id="register_div">
                     <a href="#">
-                        <span id="register" class="text-center float-end">Register</span>
+                        <span id="register" class="text-center float-end mt-3">Register</span>
                     </a>
                 </div>
                 <div class="d-none dropdown" id="dropdown_home_div">
-                    <button class="btn btn-secondary dropdown-toggle float-end" type="button" id="dropdownMenuButton"
-                        data-bs-toggle="dropdown" aria-expanded="false">
+                    <button class="btn btn-secondary dropdown-toggle float-end mt-3" type="button"
+                        id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
                         Home
                     </button>
                     <ul class="dropdown-menu dropdown_dark" aria-labelledby="dropdownMenuButton">
@@ -58,9 +54,17 @@
                 </div>
             </div>
             <div class="row g-3 align-items-center">
-                <div class="col-sm-6 col-center-block mb-3">
+
+                <div class="col-md-1">
+                </div>
+                <div class="col-md-1" id="login_div">
+                    <a href="/"><img src="images/android-chrome-108x108.png" alt="" width="60" height="60"></a>
+                </div>
+                <div class="col-md-6 col-center-block mb-3">
                     <input type="text" class="form-control " id="search_words" aria-describedby="Search"
                         placeholder="Search Prompts and Images">
+                </div>
+                <div class="col-md-2">
                 </div>
             </div>
             <div class="row g-3 align-items-center">
@@ -74,6 +78,17 @@
             </div>
             <div id="row_div" class="row photos">
             </div>
+            <div id="foot" class="row g-3 align-items-center">
+                <div class="text-center">
+                    <a href="#">
+                        <span id="see_more" class="text-center mt-3">See more...</span>
+                    </a>
+                </div>
+                <div id="beian" class="text-center">
+                    <!-- <a href="http://beian.miit.gov.cn" target="_blank">浙ICP备2023001289号</a> -->
+                </div>
+            </div>
+
         </div>
         <!-- 模态框（Modal） -->
         <div class="modal fade" id="imageDetailModal" tabindex="-1" role="dialog"
@@ -205,7 +220,7 @@
 <script type="text/javascript">
     var is_my = false
     $(document).ready(InitLoadPage)
-    $(window).scroll(ScrollPage)
+    $(window).scroll(LimitScrollPage)
 </script>
 
 </html>
