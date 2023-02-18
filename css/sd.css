@@ -33,6 +33,10 @@ body {
     color: var(--textColor);
 }
 
+.foot_text {
+    color: #938e8e;
+}
+
 .col-center-block {
     float: none;
     display: block;
