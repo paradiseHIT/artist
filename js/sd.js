@@ -643,7 +643,6 @@ function GenerateModelParameterDiv(title, text) {
 $("body").delegate('.small_modal_img', 'click', function () {
     $(this).css("opacity", "1").siblings().css("opacity", "0.4");
     src_url = $(this).attr("src")
-    console.log(src_url)
     $("#focus_image").attr("src", src_url)
 })
 
