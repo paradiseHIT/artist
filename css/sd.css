@@ -78,6 +78,21 @@ body {
     vertical-align: middle;
 }
 
+.small_modal_img {
+    display: inline-block;
+    max-width: 60px;
+    max-height: auto;
+    border-radius: 6px;
+    text-align: center;
+    vertical-align: middle;
+    cursor: pointer;
+    margin: 2px
+}
+
+.small_modal_img_dark {
+    opacity: 0.4;
+}
+
 .modal-header {
     display: flex;
     flex-shrink: 0;

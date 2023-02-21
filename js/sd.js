@@ -57,6 +57,8 @@ if (document.getElementById("my_fav_search_words") != null) {
     })
 }
 
+
+
 $("#search_btn").click(SearchIndex)
 $("#see_more").click(function () {
     $("#login").click()
@@ -638,20 +640,54 @@ function GenerateModelParameterDiv(title, text) {
     return d_elem
 }
 
+$("body").delegate('.small_modal_img', 'click', function () {
+    $(this).css("opacity", "1").siblings().css("opacity", "0.4");
+    src_url = $(this).attr("src")
+    console.log(src_url)
+    $("#focus_image").attr("src", src_url)
+})
+
 $("body").delegate('#list-img', 'click', function () {
     $('.modal-image').empty();
     $('#modal-prompt').empty();
     $('#modal-parameters').empty();
 
     var this_job_id = $($(this).parents('div').children('#j_span')).text()
+    var this_image_id = $($(this).parents('div').children('#i_span')).text()
     QueryOnce(this_job_id, false)
 
+    var img_div = $("<div></div>")
     var img_elem = $(this).clone()
     img_elem.removeClass("img-thumbnail")
     img_elem.removeAttr("id")
+    img_elem.attr("id", "focus_image")
     img_elem.addClass("modal_img")
+
+    img_div.append(img_elem)
     var model_image = $(".modal-image")
-    model_image.append(img_elem)
+    model_image.append(img_div)
+    var small_imgs_div = $("<div></div>")
+    for (i = 0; i < image_details.length; i++) {
+        if (image_details[i]["image_id"] == this_image_id) {
+            var small_image = $("<img></img>")
+            small_image.addClass("small_modal_img")
+            small_image.attr("src", image_details[i]["image_url"])
+            small_imgs_div.append(small_image)
+        } else {
+            continue
+        }
+    }
+    for (i = 0; i < image_details.length; i++) {
+        if (image_details[i]["image_id"] == this_image_id) {
+            continue
+        } else {
+            var small_image = $("<img></img>")
+            small_image.addClass("small_modal_img small_modal_img_dark")
+            small_image.attr("src", image_details[i]["image_url"])
+            small_imgs_div.append(small_image)
+        }
+    }
+    model_image.append(small_imgs_div)
 
     var prompt_elem = $("<span>" + prompt_str + "</span>")
     prompt_elem.attr("id", "l_span_prompt")
@@ -780,25 +816,6 @@ $("body").delegate('#list-img', 'click', function () {
             console.log(ret_data["code"])
             console.log(ret_data)
         })
-
-
-        // $.post("/isFavorite", post_data, function (data) {
-        //     try {
-        //         if (data["message"] == "success") {
-        //             if (data["data"]["is_fav"] == true) {
-        //                 $('#span_fav').removeClass("bi-heart bi-heart-fill")
-        //                 $('#span_fav').addClass("bi-heart-fill")
-        //             } else {
-        //                 $('#span_fav').removeClass("bi-heart bi-heart-fill")
-        //                 $('#span_fav').addClass("bi-heart")
-        //             }
-        //         }
-        //     } catch (error) {
-        //         $('#span_fav').removeClass("bi-heart bi-heart-fill")
-        //         $('#span_fav').addClass("bi-heart")
-        //         console.log(error)
-        //     }
-        // })
     } else {
         $('#span_fav').removeClass("bi-heart bi-heart-fill")
         $('#span_fav').addClass("bi-heart")
