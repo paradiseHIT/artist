@@ -58,7 +58,6 @@ if (document.getElementById("my_fav_search_words") != null) {
 }
 
 
-
 $("#search_btn").click(SearchIndex)
 $("#see_more").click(function () {
     $("#login").click()
@@ -359,8 +358,6 @@ function DisplayQueryInfo() {
 }
 
 function UpdateElementValue(element, value) {
-    console.log(element)
-    console.log(value)
     if (typeof (value) != "undefined") {
         $(element).val(value)
     }
@@ -644,6 +641,25 @@ $("body").delegate('.small_modal_img', 'click', function () {
     $(this).css("opacity", "1").siblings().css("opacity", "0.4");
     src_url = $(this).attr("src")
     $("#focus_image").attr("src", src_url)
+    this_image_id = $(this).attr("id")
+    UpdateSpanContent("image_id_span", this_image_id)
+    post_data = {
+        "image_id": this_image_id,
+    }
+    $.post("/isFavorite", post_data, function (ret_data) {
+        if (ret_data["message"] == "success") {
+            if (ret_data["data"]["is_fav"] == true) {
+                $('#span_fav').removeClass("bi-heart bi-heart-fill")
+                $('#span_fav').addClass("bi-heart-fill")
+            } else {
+                $('#span_fav').removeClass("bi-heart bi-heart-fill")
+                $('#span_fav').addClass("bi-heart")
+            }
+        } else {
+            $('#span_fav').removeClass("bi-heart bi-heart-fill")
+            $('#span_fav').addClass("bi-heart")
+        }
+    })
 })
 
 $("body").delegate('#list-img', 'click', function () {
@@ -671,6 +687,7 @@ $("body").delegate('#list-img', 'click', function () {
             var small_image = $("<img></img>")
             small_image.addClass("small_modal_img")
             small_image.attr("src", image_details[i]["image_url"])
+            small_image.attr("id", image_details[i]["image_id"])
             small_imgs_div.append(small_image)
         } else {
             continue
@@ -683,6 +700,7 @@ $("body").delegate('#list-img', 'click', function () {
             var small_image = $("<img></img>")
             small_image.addClass("small_modal_img small_modal_img_dark")
             small_image.attr("src", image_details[i]["image_url"])
+            small_image.attr("id", image_details[i]["image_id"])
             small_imgs_div.append(small_image)
         }
     }
