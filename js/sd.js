@@ -256,7 +256,7 @@ function GenerateInitilize() {
         steps = 50
         $("#steps").val(steps)
     }
-    if ($("#n_samples").val() == "" || $("#n_samples").val() == 0) {
+    if ($("#n_samples").val() == "" || $("#n_samples").val() == 0 || $("#n_samples").val() > 6) {
         n_samples = 6
         $("#n_samples").val(n_samples)
     }
