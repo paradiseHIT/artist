@@ -681,7 +681,7 @@ $("body").delegate('#list-img', 'click', function () {
     img_div.append(img_elem)
     var model_image = $(".modal-image")
     model_image.append(img_div)
-    var small_imgs_div = $("<div></div>")
+    var small_imgs_div = $("<div class='mt-2'></div>")
     for (i = 0; i < image_details.length; i++) {
         if (image_details[i]["image_id"] == this_image_id) {
             var small_image = $("<img></img>")
