@@ -378,23 +378,6 @@ function UpdateImages(image_urls, prompts, job_ids, image_ids) {
         i_span_elem.hide()
         div_elems[i].append(i_span_elem)
 
-        if (prompts != undefined) {
-            if (Array.isArray(prompts)) {
-                var s_span_elem = $("<span>" + ShortenString(prompts[i], MAX_PROMPT_DISPLAY_LENGTH) + "</span>")
-                div_elems[i].append(s_span_elem)
-                var l_span_elem = $("<span>" + prompts[i] + "</span>")
-                l_span_elem.attr("id", "l_span")
-                l_span_elem.hide()
-                div_elems[i].append(l_span_elem)
-            } else {
-                var s_span_elem = $("<span>" + ShortenString(prompts, MAX_PROMPT_DISPLAY_LENGTH) + "</span>")
-                div_elems[i].append(s_span_elem)
-                var l_span_elem = $("<span>" + prompts + "</span>")
-                l_span_elem.attr("id", "l_span")
-                l_span_elem.hide()
-                div_elems[i].append(l_span_elem)
-            }
-        }
         if (job_ids != undefined) {
             var j_span_elem = $("<span>" + job_ids[i] + "</span>")
             j_span_elem.attr("id", "j_span")
@@ -464,6 +447,23 @@ function UpdateImages(image_urls, prompts, job_ids, image_ids) {
         image_elem.attr("id", "list-img")
         a_elem.append(image_elem)
         div_elems[i].append(a_elem)
+        if (prompts != undefined) {
+            if (Array.isArray(prompts)) {
+                var s_span_elem = $("<span>" + ShortenString(prompts[i], MAX_PROMPT_DISPLAY_LENGTH) + "</span>")
+                div_elems[i].append(s_span_elem)
+                var l_span_elem = $("<span>" + prompts[i] + "</span>")
+                l_span_elem.attr("id", "l_span")
+                l_span_elem.hide()
+                div_elems[i].append(l_span_elem)
+            } else {
+                var s_span_elem = $("<span>" + ShortenString(prompts, MAX_PROMPT_DISPLAY_LENGTH) + "</span>")
+                div_elems[i].append(s_span_elem)
+                var l_span_elem = $("<span>" + prompts + "</span>")
+                l_span_elem.attr("id", "l_span")
+                l_span_elem.hide()
+                div_elems[i].append(l_span_elem)
+            }
+        }
 
         row_photos.append(div_elems[i])
     }
