@@ -365,10 +365,96 @@ function UpdateElementValue(element, value) {
 }
 function UpdateImages(image_urls, prompts, job_ids, image_ids) {
     var row_photos = $("#row_div")
+    var div_elems = new Array(image_urls.length)
+    is_login = IsLogin()
     for (var i = 0; i < image_urls.length; i++) {
-        var div_elem = $("<div></div>")
-        div_elem.addClass("col-sm-3 col-md-2 col-lg-2 mb-1 item")
-        div_elem.attr("align", "center")
+
+        div_elems[i] = $("<div></div>")
+        div_elems[i].addClass("col-sm-3 col-md-2 col-lg-2 mb-1 item")
+        div_elems[i].attr("align", "center")
+        div_elems[i].attr("id", "album_" + image_ids[i])
+        var i_span_elem = $("<span>" + image_ids[i] + "</span>")
+        i_span_elem.attr("id", "i_span")
+        i_span_elem.hide()
+        div_elems[i].append(i_span_elem)
+
+        if (prompts != undefined) {
+            if (Array.isArray(prompts)) {
+                var s_span_elem = $("<span>" + ShortenString(prompts[i], MAX_PROMPT_DISPLAY_LENGTH) + "</span>")
+                div_elems[i].append(s_span_elem)
+                var l_span_elem = $("<span>" + prompts[i] + "</span>")
+                l_span_elem.attr("id", "l_span")
+                l_span_elem.hide()
+                div_elems[i].append(l_span_elem)
+            } else {
+                var s_span_elem = $("<span>" + ShortenString(prompts, MAX_PROMPT_DISPLAY_LENGTH) + "</span>")
+                div_elems[i].append(s_span_elem)
+                var l_span_elem = $("<span>" + prompts + "</span>")
+                l_span_elem.attr("id", "l_span")
+                l_span_elem.hide()
+                div_elems[i].append(l_span_elem)
+            }
+        }
+        if (job_ids != undefined) {
+            var j_span_elem = $("<span>" + job_ids[i] + "</span>")
+            j_span_elem.attr("id", "j_span")
+            j_span_elem.hide()
+            div_elems[i].append(j_span_elem)
+        }
+        var fav_btn_elem = $("<div></div>")
+        fav_btn_elem.attr("id", "fav_" + image_ids[i])
+        fav_btn_elem.addClass("fav-button")
+        fav_btn_elem.attr("title", "favorite")
+        div_elems[i].append(fav_btn_elem)
+
+
+        if (is_login) {
+            post_data = {
+                "image_id": image_ids[i],
+            }
+            $.ajax({
+                type: "post",
+                url: "/isFavorite",
+                data: post_data,
+                dataType: "json",
+                async: true,
+                crossDomain: true,
+                success: function (ret_data) {
+                    if (ret_data["message"] == "success") {
+                        this_image_id = ret_data["data"]["image_id"]
+                        fav_btn_elem = $("#fav_" + this_image_id)
+                        if (ret_data["data"]["is_fav"] == true) {
+                            fav_btn_elem.append("<i class='bi bi-heart-fill fav'></i>")
+                        } else {
+                            fav_btn_elem.append("<i class='bi bi-heart'></i>")
+                        }
+                        // div_elem = $("#album_" + this_image_id)
+                        // console.log("#album_" + this_image_id)
+                        // div_elem.append(fav_btn_elem)
+                    }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    console.warn(XMLHttpRequest.status);
+                    console.warn(XMLHttpRequest.readyState);
+                    console.warn(textStatus);
+                },
+                complete: function (XMLHttpRequest, textStatus) {
+                    if (XMLHttpRequest.status != 200) {
+                        console.warn("request complete:" + XMLHttpRequest.status);
+                    }
+                }
+            }).fail(function (ret_data) {
+                // div_elem = $("#album_" + image_ids[i])
+                // console.log("#album2_" + image_ids[i])
+                div_elem.append(fav_btn_elem)
+                console.log("fail")
+                console.log(ret_data["code"])
+                console.log(ret_data)
+            })
+        } else {
+            fav_btn_elem.append("<i class='bi bi-heart'></i>")
+        }
+
         var image_url = image_urls[i]
         var a_elem = $("<a></a>")
         a_elem.attr("data-lightbox", "photos")
@@ -377,38 +463,9 @@ function UpdateImages(image_urls, prompts, job_ids, image_ids) {
         image_elem.attr("src", image_url)
         image_elem.attr("id", "list-img")
         a_elem.append(image_elem)
-        div_elem.append(a_elem)
-        if (prompts != undefined) {
-            if (Array.isArray(prompts)) {
-                var s_span_elem = $("<span>" + ShortenString(prompts[i], MAX_PROMPT_DISPLAY_LENGTH) + "</span>")
-                div_elem.append(s_span_elem)
-                var l_span_elem = $("<span>" + prompts[i] + "</span>")
-                l_span_elem.attr("id", "l_span")
-                l_span_elem.hide()
-                div_elem.append(l_span_elem)
-            } else {
-                var s_span_elem = $("<span>" + ShortenString(prompts, MAX_PROMPT_DISPLAY_LENGTH) + "</span>")
-                div_elem.append(s_span_elem)
-                var l_span_elem = $("<span>" + prompts + "</span>")
-                l_span_elem.attr("id", "l_span")
-                l_span_elem.hide()
-                div_elem.append(l_span_elem)
-            }
-        }
-        if (job_ids != undefined) {
-            var j_span_elem = $("<span>" + job_ids[i] + "</span>")
-            j_span_elem.attr("id", "j_span")
-            j_span_elem.hide()
-            div_elem.append(j_span_elem)
-        }
+        div_elems[i].append(a_elem)
 
-        if (image_ids != undefined) {
-            var i_span_elem = $("<span>" + image_ids[i] + "</span>")
-            i_span_elem.attr("id", "i_span")
-            i_span_elem.hide()
-            div_elem.append(i_span_elem)
-        }
-        row_photos.append(div_elem)
+        row_photos.append(div_elems[i])
     }
 }
 
@@ -649,14 +706,14 @@ $("body").delegate('.small_modal_img', 'click', function () {
     $.post("/isFavorite", post_data, function (ret_data) {
         if (ret_data["message"] == "success") {
             if (ret_data["data"]["is_fav"] == true) {
-                $('#span_fav').removeClass("bi-heart bi-heart-fill")
-                $('#span_fav').addClass("bi-heart-fill")
+                $('#span_fav').removeClass("bi-heart bi-heart-fill fav")
+                $('#span_fav').addClass("bi-heart-fill fav")
             } else {
-                $('#span_fav').removeClass("bi-heart bi-heart-fill")
+                $('#span_fav').removeClass("bi-heart bi-heart-fill fav")
                 $('#span_fav').addClass("bi-heart")
             }
         } else {
-            $('#span_fav').removeClass("bi-heart bi-heart-fill")
+            $('#span_fav').removeClass("bi-heart bi-heart-fill fav")
             $('#span_fav').addClass("bi-heart")
         }
     })
@@ -808,10 +865,10 @@ $("body").delegate('#list-img', 'click', function () {
             success: function (ret_data) {
                 if (ret_data["message"] == "success") {
                     if (ret_data["data"]["is_fav"] == true) {
-                        $('#span_fav').removeClass("bi-heart bi-heart-fill")
-                        $('#span_fav').addClass("bi-heart-fill")
+                        $('#span_fav').removeClass("bi-heart bi-heart-fill fav")
+                        $('#span_fav').addClass("bi-heart-fill fav")
                     } else {
-                        $('#span_fav').removeClass("bi-heart bi-heart-fill")
+                        $('#span_fav').removeClass("bi-heart bi-heart-fill fav")
                         $('#span_fav').addClass("bi-heart")
                     }
                 }
@@ -898,9 +955,12 @@ $("body").delegate('#modal_ban', 'click', function () {
     }
 })
 
-$("body").delegate('#modal_favorite', 'click', function () {
-    var image_id = $('#image_id_span').text()
-    var class_name = $('#span_fav').attr("class")
+$("body").delegate('.bi', 'click', ClickFavIcon)
+
+function ClickFavIcon() {
+    this_li = $(this)
+    var image_id = this_li.parents('div').attr("id").split('_')[1]
+    var class_name = this_li.attr("class")
     if (IsLogin()) {
         if (class_name == "bi bi-heart") {
             post_data = {
@@ -910,8 +970,8 @@ $("body").delegate('#modal_favorite', 'click', function () {
             $.post("/favorite", post_data, function (data) {
                 try {
                     if (data["message"] == "success") {
-                        $('#span_fav').removeClass("bi-heart bi-heart-fill")
-                        $('#span_fav').addClass("bi-heart-fill")
+                        this_li.removeClass("bi-heart bi-heart-fill fav")
+                        this_li.addClass("bi-heart-fill fav")
                     } else {
                         alert(data["message"])
                     }
@@ -927,7 +987,51 @@ $("body").delegate('#modal_favorite', 'click', function () {
             $.post("/favorite", post_data, function (data) {
                 try {
                     if (data["message"] == "success") {
-                        $('#span_fav').removeClass("bi-heart bi-heart-fill")
+                        this_li.removeClass("bi-heart bi-heart-fill fav")
+                        this_li.addClass("bi-heart")
+                    } else {
+                        alert(data["message"])
+                    }
+                } catch (error) {
+                    console.log(error)
+                }
+            })
+        }
+    } else {
+        $("#loginModal").modal("show")
+    }
+}
+
+function ClickModalFav() {
+    var image_id = $('#image_id_span').text()
+    var class_name = $('#span_fav').attr("class")
+    if (IsLogin()) {
+        if (class_name == "bi bi-heart") {
+            post_data = {
+                "image_id": image_id,
+                "is_fav": true
+            }
+            $.post("/favorite", post_data, function (data) {
+                try {
+                    if (data["message"] == "success") {
+                        $('#span_fav').removeClass("bi-heart bi-heart-fill fav")
+                        $('#span_fav').addClass("bi-heart-fill fav")
+                    } else {
+                        alert(data["message"])
+                    }
+                } catch (error) {
+                    console.log(error)
+                }
+            })
+        } else {
+            post_data = {
+                "image_id": image_id,
+                "is_fav": false
+            }
+            $.post("/favorite", post_data, function (data) {
+                try {
+                    if (data["message"] == "success") {
+                        $('#span_fav').removeClass("bi-heart bi-heart-fill fav")
                         $('#span_fav').addClass("bi-heart")
                     } else {
                         alert(data["message"])
@@ -940,7 +1044,9 @@ $("body").delegate('#modal_favorite', 'click', function () {
     } else {
         $("#loginModal").modal("show")
     }
-})
+}
+
+$("body").delegate('#modal_favorite', 'click', ClickModalFav)
 
 function CopyTextromModal(text) {
     var textarea = document.createElement("input");//创建input对象

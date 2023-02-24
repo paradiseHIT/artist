@@ -103,3 +103,31 @@ body {
     border-top-left-radius: var(--bs-modal-inner-border-radius);
     border-top-right-radius: var(--bs-modal-inner-border-radius);
 }
+
+.fav-button {
+    position: absolute;
+    z-index: 2;
+    cursor: pointer;
+    padding-top: 4px;
+    padding-right: 4px;
+    text-align: right;
+    width: 12.5%;
+    font-size: large;
+    /* color: whitesmoke;
+    font-size: medium;
+    color: whitesmoke;
+    font-size: medium;
+    text-align: left;*/
+}
+
+.fav-button :hover {
+    color: red;
+}
+
+.fav {
+    color: red;
+}
+
+.fav-button.fav :hover {
+    color: white;
+}
