@@ -275,7 +275,7 @@ function GenerateInitilize() {
 
 function EmptyDisplay() {
     $("#queue_div").empty()
-    $("#row_div").empty()
+    // $("#row_div").empty()
 }
 
 function SetDivById(div_id, str) {
@@ -904,6 +904,11 @@ $("body").delegate('#modal-close', 'click', function () {
 $("body").delegate('#modal-editor', 'click', function () {
     window.open("editor.html");
 });
+$('#gen_btn').click(function () {
+    localStorage.setItem("prompt", $("#search_words").val());
+    console.log("search_words:" + $("#search_words").val())
+    window.open("editor.html");
+});
 
 $("body").delegate('#modal_copy', 'click', function () {
     $('#modal_copy').empty();
@@ -1066,8 +1071,8 @@ function CopyTextromModal(text) {
 }
 
 function GetInfoFromLocalStorage() {
-    job_id = localStorage.getItem("job_id");
-    if (job_id == null) {
+    prompt_str = localStorage.getItem("prompt");
+    if (prompt_str == null) {
         Init()
     } else {
         width = localStorage.getItem("width");
