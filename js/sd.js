@@ -376,23 +376,27 @@ function UpdateImages(image_urls, prompts, job_ids, image_ids, is_append) {
     var div_elems = new Array(image_urls.length)
     is_login = IsLogin()
     for (var i = 0; i < image_urls.length; i++) {
+        var image_index = i
+        if (is_append == false) {
+            image_index = image_urls.length - i - 1
+        }
         div_elems[i] = $("<div></div>")
         div_elems[i].addClass("col-sm-3 col-md-2 col-lg-2 mb-1 item")
         div_elems[i].attr("align", "center")
-        div_elems[i].attr("id", "album_" + image_ids[i])
-        var i_span_elem = $("<span>" + image_ids[i] + "</span>")
+        div_elems[i].attr("id", "album_" + image_ids[image_index])
+        var i_span_elem = $("<span>" + image_ids[image_index] + "</span>")
         i_span_elem.attr("id", "i_span")
         i_span_elem.hide()
         div_elems[i].append(i_span_elem)
 
         if (job_ids != undefined) {
-            var j_span_elem = $("<span>" + job_ids[i] + "</span>")
+            var j_span_elem = $("<span>" + job_ids[image_index] + "</span>")
             j_span_elem.attr("id", "j_span")
             j_span_elem.hide()
             div_elems[i].append(j_span_elem)
         }
         var fav_btn_elem = $("<div></div>")
-        fav_btn_elem.attr("id", "fav_" + image_ids[i])
+        fav_btn_elem.attr("id", "fav_" + image_ids[image_index])
         fav_btn_elem.addClass("fav-button")
         fav_btn_elem.attr("title", "favorite")
         div_elems[i].append(fav_btn_elem)
@@ -445,7 +449,7 @@ function UpdateImages(image_urls, prompts, job_ids, image_ids, is_append) {
             fav_btn_elem.append("<i class='bi bi-heart'></i>")
         }
 
-        var image_url = image_urls[i]
+        var image_url = image_urls[image_index]
         var a_elem = $("<a></a>")
         a_elem.attr("data-lightbox", "photos")
         image_elem = $("<img>")
