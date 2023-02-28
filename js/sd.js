@@ -275,7 +275,7 @@ function GenerateInitilize() {
 
 function EmptyDisplay() {
     $("#queue_div").empty()
-    // $("#row_div").empty()
+    $("#row_div").empty()
 }
 
 function SetDivById(div_id, str) {
