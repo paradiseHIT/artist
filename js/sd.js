@@ -91,7 +91,10 @@ $("#query_btn").click(function () {
         $("#job_id").val("please input job id")
     } else {
         Init()
-        QueryOnce(job_id, true)
+        //show and append
+        var is_append = true
+        var is_show = true
+        QueryOnce(job_id, is_show, is_append)
     }
 })
 
@@ -107,9 +110,12 @@ $("#generate_btn").click(function () {
                 if (query_interval_id != undefined) {
                     clearInterval(query_interval_id)
                 }
-                QueryOnce(job_id, true)
+                //show but prepand
+                var is_append = false
+                var is_show = true
+                QueryOnce(job_id, is_show, is_append)
                 var x = 1000
-                query_interval_id = setInterval("QueryOnce(" + job_id + ", true)", x);
+                query_interval_id = setInterval("QueryOnce(" + job_id + ", " + is_show + ", " + is_append + ")", x);
             } else {
                 DisplayError()
             }
@@ -273,6 +279,12 @@ function GenerateInitilize() {
     }
 }
 
+function EmptyQueue() {
+    $("#queue_div").empty()
+}
+function EmptyRow() {
+    $("#row_div").empty()
+}
 function EmptyDisplay() {
     $("#queue_div").empty()
     $("#row_div").empty()
@@ -363,12 +375,11 @@ function UpdateElementValue(element, value) {
     }
 
 }
-function UpdateImages(image_urls, prompts, job_ids, image_ids) {
+function UpdateImages(image_urls, prompts, job_ids, image_ids, is_append) {
     var row_photos = $("#row_div")
     var div_elems = new Array(image_urls.length)
     is_login = IsLogin()
     for (var i = 0; i < image_urls.length; i++) {
-
         div_elems[i] = $("<div></div>")
         div_elems[i].addClass("col-sm-3 col-md-2 col-lg-2 mb-1 item")
         div_elems[i].attr("align", "center")
@@ -465,13 +476,20 @@ function UpdateImages(image_urls, prompts, job_ids, image_ids) {
             }
         }
 
-        row_photos.append(div_elems[i])
+        if (is_append) {
+            row_photos.append(div_elems[i])
+        } else {
+            row_photos.prepend(div_elems[i])
+        }
     }
 }
 
-function ShowQueryResult(mydata, is_show) {
+function ShowQueryResult(mydata, is_show, is_append) {
     if (is_show) {
-        EmptyDisplay()
+        EmptyQueue()
+        if (is_append) {
+            EmptyRow()
+        }
     }
     try {
         var code = mydata["code"]
@@ -491,14 +509,14 @@ function ShowQueryResult(mydata, is_show) {
             job_not_exists = false
             image_details = mydata["data"]["images"]
 
-            if (is_show == true) {
+            if (is_show) {
                 DisplayQueryInfo()
                 if (state == 0) {
                     DisplayQueue(queue_len)
                 } else if (state == 1) {
                     DisplayInProgress(query_times++)
                 } else if (state == 2) {
-                    ShowImages(image_details, false)
+                    ShowImages(image_details, false, is_append)
                     clearInterval(query_interval_id)
                 } else if (state == 3) {
                     DisplayError()
@@ -523,11 +541,11 @@ function ShowQueryResult(mydata, is_show) {
     }
 }
 
-function QueryOnce(job_id, is_show) {
+function QueryOnce(job_id, is_show, is_append) {
     var post_data = { "job_id": parseInt(job_id) }
     $.post("/query", post_data, function (mydata) {
         try {
-            ShowQueryResult(mydata, is_show)
+            ShowQueryResult(mydata, is_show, is_append)
         } catch (error) {
             console.log(error)
         }
@@ -653,7 +671,7 @@ function LoadMyFavoriteImages(page_num) {
     return can_continue
 }
 
-function ShowImages(show_image_details, index = true) {
+function ShowImages(show_image_details, index = true, is_append = true) {
     image_urls = []
     prompts = []
     job_ids = []
@@ -669,7 +687,7 @@ function ShowImages(show_image_details, index = true) {
         prompts.push(show_image_details[i]["prompt"])
         job_ids.push(show_image_details[i]["job_id"])
     }
-    UpdateImages(image_urls, prompts, job_ids, image_ids)
+    UpdateImages(image_urls, prompts, job_ids, image_ids, is_append)
 }
 
 function ShortenString(input_str, max_len) {
@@ -726,7 +744,9 @@ $("body").delegate('#list-img', 'click', function () {
 
     var this_job_id = $($(this).parents('div').children('#j_span')).text()
     var this_image_id = $($(this).parents('div').children('#i_span')).text()
-    QueryOnce(this_job_id, false)
+    var is_show = false
+    var is_append = false
+    QueryOnce(this_job_id, is_show, is_append)
 
     var img_div = $("<div></div>")
     var img_elem = $(this).clone()
