@@ -951,7 +951,7 @@ $("body").delegate('#modal_ban', 'click', function () {
                         $('#span_ban').removeClass("bi-eye bi-eye-slash")
                         $('#span_ban').addClass("bi-eye-slash")
                     } else {
-                        alert(data["message"])
+                        console.warn(data["message"])
                     }
                 } catch (error) {
                     console.log(error)
@@ -968,7 +968,7 @@ $("body").delegate('#modal_ban', 'click', function () {
                         $('#span_ban').removeClass("bi-eye bi-eye-slash")
                         $('#span_ban').addClass("bi-eye")
                     } else {
-                        alert(data["message"])
+                        console.warn(data["message"])
                     }
                 } catch (error) {
                     console.log(error)
@@ -998,7 +998,7 @@ function ClickFavIcon() {
                         this_li.removeClass("bi-heart bi-heart-fill fav")
                         this_li.addClass("bi-heart-fill fav")
                     } else {
-                        alert(data["message"])
+                        console.warn(data["message"])
                     }
                 } catch (error) {
                     console.log(error)
@@ -1015,7 +1015,7 @@ function ClickFavIcon() {
                         this_li.removeClass("bi-heart bi-heart-fill fav")
                         this_li.addClass("bi-heart")
                     } else {
-                        alert(data["message"])
+                        console.warn(data["message"])
                     }
                 } catch (error) {
                     console.log(error)
@@ -1042,7 +1042,7 @@ function ClickModalFav() {
                         $('#span_fav').removeClass("bi-heart bi-heart-fill fav")
                         $('#span_fav').addClass("bi-heart-fill fav")
                     } else {
-                        alert(data["message"])
+                        console.warn(data["message"])
                     }
                 } catch (error) {
                     console.log(error)
@@ -1059,7 +1059,7 @@ function ClickModalFav() {
                         $('#span_fav').removeClass("bi-heart bi-heart-fill fav")
                         $('#span_fav').addClass("bi-heart")
                     } else {
-                        alert(data["message"])
+                        console.warn(data["message"])
                     }
                 } catch (error) {
                     console.log(error)
