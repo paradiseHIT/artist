@@ -1,8 +1,8 @@
 <!--
  * @Author: xing paradisehit@gmil.com
  * @Date: 2022-11-26 15:44:34
- * @LastEditors: xing paradisehit@gmail.com
- * @LastEditTime: 2023-02-23 23:52:32
+ * @LastEditors: 叔宝 shubao.sx@alibaba-inc.com
+ * @LastEditTime: 2023-03-15 00:18:15
  * @FilePath: /web/editor.html
  * @Description:生成图片
 -->
@@ -59,6 +59,21 @@
                     <span class="input-group-text">Prompt</span>
                     <textarea id="prompt" class="form-control" aria-label="Prompt" rows="3"
                         placeholder="a photo of an astronaut riding a horse on mars"></textarea>
+                </div>
+            </div>
+            <div class="row g-3 align-items-center">
+                <div class="input-group mb-3" id="style_radio">
+                    <span class="input-group-text" style="width: 70px;">Style</span>
+                    <div class="form-check">
+                        <input type="radio" class="form-check-input" id="style_radio1" name="optradio"
+                            value="default_model">stable diffusion
+                        <label class="form-check-label" for="style_radio1"></label>
+                    </div>
+                    <div class="form-check">
+                        <input type="radio" class="form-check-input" id="style_radio2" name="optradio"
+                            value="mj_model">midjourney like
+                        <label class="form-check-label" for="style_radio2"></label>
+                    </div>
                 </div>
             </div>
             <div class="row g-3 align-items-center">

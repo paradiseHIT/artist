@@ -21,6 +21,7 @@ var height = undefined
 var guidance_scale = 7.5
 var random_seed = undefined
 var sampler = "ddim"
+var model_id = "default_model"
 var n_samples = undefined
 var job_not_exists = false
 var job_internal_error = false
@@ -91,10 +92,7 @@ $("#query_btn").click(function () {
         $("#job_id").val("please input job id")
     } else {
         Init()
-        //show and append
-        var is_append = true
-        var is_show = true
-        QueryOnce(job_id, is_show, is_append)
+        QueryOnce(job_id, true)
     }
 })
 
@@ -110,12 +108,9 @@ $("#generate_btn").click(function () {
                 if (query_interval_id != undefined) {
                     clearInterval(query_interval_id)
                 }
-                //show but prepand
-                var is_append = false
-                var is_show = true
-                QueryOnce(job_id, is_show, is_append)
+                QueryOnce(job_id, true)
                 var x = 1000
-                query_interval_id = setInterval("QueryOnce(" + job_id + ", " + is_show + ", " + is_append + ")", x);
+                query_interval_id = setInterval("QueryOnce(" + job_id + ", true)", x);
             } else {
                 DisplayError()
             }
@@ -232,6 +227,7 @@ function Init() {
     guidance_scale = 7.5
     random_seed = undefined
     sampler = "ddim"
+    model_id = "default_model"
     n_samples = undefined
     job_not_exists = false
     job_internal_error = false
@@ -277,14 +273,12 @@ function GenerateInitilize() {
     if ($("#sampler").val() == "") {
         $("#sampler").val("ddim")
     }
+    //for model id
+    if ($("input:radio:checked").val() == undefined) {
+        $('input:radio[value=default_model]').attr('checked', 'true');
+    }
 }
 
-function EmptyQueue() {
-    $("#queue_div").empty()
-}
-function EmptyRow() {
-    $("#row_div").empty()
-}
 function EmptyDisplay() {
     $("#queue_div").empty()
     $("#row_div").empty()
@@ -299,6 +293,7 @@ function DisplayJobNotExists(job_id) {
 
     q_text = "<p>Job:<red>" + job_id + "</red> not exists</p>"
     queue_div.append($(q_text))
+    $(".container").append(queue_div)
 }
 function DisplayError() {
     var queue_div = $("<div></div>")
@@ -306,6 +301,7 @@ function DisplayError() {
 
     q_text = "<p>Internal Error</p>"
     queue_div.append($(q_text))
+    $(".container").append(queue_div)
 }
 
 function DisplayInProgress(n) {
@@ -316,12 +312,14 @@ function DisplayInProgress(n) {
         tmp += "."
     }
     queue_div.append($("<p>current request is processing" + tmp + "</p>"))
+    $(".container").append(queue_div)
 }
 
 function DisplayQueue(n) {
     var queue_div = $("#queue_div")
     queue_div.empty()
     queue_div.append($("<p>current request is order <red>" + n + "</red></p>"))
+    $(".container").append(queue_div)
 }
 
 function DisplayPrompt(p_str) {
@@ -358,11 +356,11 @@ function DisplayQueryInfo() {
     // $("#negative_prompt").val(negative_prompt)
     UpdateElementValue("#negative_prompt", negative_prompt)
     if (typeof (sampler) != "undefined") {
-
         document.getElementById('sampler').value = sampler;
     }
     // $("#n_samples").val(n_samples)
     UpdateElementValue("#n_samples", n_samples)
+    $("input:radio[value='" + model_id + "']").attr('checked', 'true');
 }
 
 function UpdateElementValue(element, value) {
@@ -371,32 +369,29 @@ function UpdateElementValue(element, value) {
     }
 
 }
-function UpdateImages(image_urls, prompts, job_ids, image_ids, is_append) {
+function UpdateImages(image_urls, prompts, job_ids, image_ids) {
     var row_photos = $("#row_div")
     var div_elems = new Array(image_urls.length)
     is_login = IsLogin()
     for (var i = 0; i < image_urls.length; i++) {
-        var image_index = i
-        if (is_append == false) {
-            image_index = image_urls.length - i - 1
-        }
+
         div_elems[i] = $("<div></div>")
         div_elems[i].addClass("col-sm-3 col-md-2 col-lg-2 mb-1 item")
         div_elems[i].attr("align", "center")
-        div_elems[i].attr("id", "album_" + image_ids[image_index])
-        var i_span_elem = $("<span>" + image_ids[image_index] + "</span>")
+        div_elems[i].attr("id", "album_" + image_ids[i])
+        var i_span_elem = $("<span>" + image_ids[i] + "</span>")
         i_span_elem.attr("id", "i_span")
         i_span_elem.hide()
         div_elems[i].append(i_span_elem)
 
         if (job_ids != undefined) {
-            var j_span_elem = $("<span>" + job_ids[image_index] + "</span>")
+            var j_span_elem = $("<span>" + job_ids[i] + "</span>")
             j_span_elem.attr("id", "j_span")
             j_span_elem.hide()
             div_elems[i].append(j_span_elem)
         }
         var fav_btn_elem = $("<div></div>")
-        fav_btn_elem.attr("id", "fav_" + image_ids[image_index])
+        fav_btn_elem.attr("id", "fav_" + image_ids[i])
         fav_btn_elem.addClass("fav-button")
         fav_btn_elem.attr("title", "favorite")
         div_elems[i].append(fav_btn_elem)
@@ -449,7 +444,7 @@ function UpdateImages(image_urls, prompts, job_ids, image_ids, is_append) {
             fav_btn_elem.append("<i class='bi bi-heart'></i>")
         }
 
-        var image_url = image_urls[image_index]
+        var image_url = image_urls[i]
         var a_elem = $("<a></a>")
         a_elem.attr("data-lightbox", "photos")
         image_elem = $("<img>")
@@ -476,20 +471,13 @@ function UpdateImages(image_urls, prompts, job_ids, image_ids, is_append) {
             }
         }
 
-        if (is_append) {
-            row_photos.append(div_elems[i])
-        } else {
-            row_photos.prepend(div_elems[i])
-        }
+        row_photos.append(div_elems[i])
     }
 }
 
-function ShowQueryResult(mydata, is_show, is_append) {
+function ShowQueryResult(mydata, is_show) {
     if (is_show) {
-        EmptyQueue()
-        if (is_append) {
-            EmptyRow()
-        }
+        EmptyDisplay()
     }
     try {
         var code = mydata["code"]
@@ -503,20 +491,21 @@ function ShowQueryResult(mydata, is_show, is_append) {
             guidance_scale = mydata["data"]["result"]["guidance_scale"]
             random_seed = mydata["data"]["result"]["random_seed"]
             negative_prompt = mydata["data"]["result"]["negative_prompt"]
+            model_id = mydata["data"]["result"]["model_id"]
             sampler = mydata["data"]["result"]["sampler"]
             n_samples = mydata["data"]["result"]["n_samples"]
             job_id = mydata["data"]["result"]['job_id']
             job_not_exists = false
             image_details = mydata["data"]["images"]
 
-            if (is_show) {
+            if (is_show == true) {
                 DisplayQueryInfo()
                 if (state == 0) {
                     DisplayQueue(queue_len)
                 } else if (state == 1) {
                     DisplayInProgress(query_times++)
                 } else if (state == 2) {
-                    ShowImages(image_details, false, is_append)
+                    ShowImages(image_details, false)
                     clearInterval(query_interval_id)
                 } else if (state == 3) {
                     DisplayError()
@@ -541,11 +530,11 @@ function ShowQueryResult(mydata, is_show, is_append) {
     }
 }
 
-function QueryOnce(job_id, is_show, is_append) {
+function QueryOnce(job_id, is_show) {
     var post_data = { "job_id": parseInt(job_id) }
     $.post("/query", post_data, function (mydata) {
         try {
-            ShowQueryResult(mydata, is_show, is_append)
+            ShowQueryResult(mydata, is_show)
         } catch (error) {
             console.log(error)
         }
@@ -563,7 +552,8 @@ function Generate() {
         "guidance_scale": $("#guidance_scale").val(),
         "steps": $("#steps").val(),
         "n_samples": $("#n_samples").val(),
-        "sampler": $("#sampler").val()
+        "sampler": $("#sampler").val(),
+        "model_id": $("input:radio:checked").val()
     }
     $.post("/generate", post_data, function (mydata) {
         try {
@@ -671,7 +661,7 @@ function LoadMyFavoriteImages(page_num) {
     return can_continue
 }
 
-function ShowImages(show_image_details, index = true, is_append = true) {
+function ShowImages(show_image_details, index = true) {
     image_urls = []
     prompts = []
     job_ids = []
@@ -687,7 +677,7 @@ function ShowImages(show_image_details, index = true, is_append = true) {
         prompts.push(show_image_details[i]["prompt"])
         job_ids.push(show_image_details[i]["job_id"])
     }
-    UpdateImages(image_urls, prompts, job_ids, image_ids, is_append)
+    UpdateImages(image_urls, prompts, job_ids, image_ids)
 }
 
 function ShortenString(input_str, max_len) {
@@ -744,9 +734,7 @@ $("body").delegate('#list-img', 'click', function () {
 
     var this_job_id = $($(this).parents('div').children('#j_span')).text()
     var this_image_id = $($(this).parents('div').children('#i_span')).text()
-    var is_show = false
-    var is_append = false
-    QueryOnce(this_job_id, is_show, is_append)
+    QueryOnce(this_job_id, false)
 
     var img_div = $("<div></div>")
     var img_elem = $(this).clone()
@@ -817,6 +805,8 @@ $("body").delegate('#list-img', 'click', function () {
     parameters_elem.append(d_elem)
     var d_elem = GenerateModelParameterDiv("Steps", steps)
     parameters_elem.append(d_elem)
+    var d_elem = GenerateModelParameterDiv("model_id", model_id)
+    parameters_elem.append(d_elem)
 
     var job_id = $('#job_id_span').text()
     localStorage.setItem("job_id", job_id);
@@ -829,6 +819,7 @@ $("body").delegate('#list-img', 'click', function () {
     localStorage.setItem("steps", steps);
     localStorage.setItem("n_samples", n_samples);
     localStorage.setItem("sampler", sampler);
+    localStorage.setItem("model_id", model_id);
 
     // check whether image is favorite
     if (IsLogin()) {
@@ -951,7 +942,7 @@ $("body").delegate('#modal_ban', 'click', function () {
                         $('#span_ban').removeClass("bi-eye bi-eye-slash")
                         $('#span_ban').addClass("bi-eye-slash")
                     } else {
-                        console.warn(data["message"])
+                        alert(data["message"])
                     }
                 } catch (error) {
                     console.log(error)
@@ -968,7 +959,7 @@ $("body").delegate('#modal_ban', 'click', function () {
                         $('#span_ban').removeClass("bi-eye bi-eye-slash")
                         $('#span_ban').addClass("bi-eye")
                     } else {
-                        console.warn(data["message"])
+                        alert(data["message"])
                     }
                 } catch (error) {
                     console.log(error)
@@ -998,7 +989,7 @@ function ClickFavIcon() {
                         this_li.removeClass("bi-heart bi-heart-fill fav")
                         this_li.addClass("bi-heart-fill fav")
                     } else {
-                        console.warn(data["message"])
+                        alert(data["message"])
                     }
                 } catch (error) {
                     console.log(error)
@@ -1015,7 +1006,7 @@ function ClickFavIcon() {
                         this_li.removeClass("bi-heart bi-heart-fill fav")
                         this_li.addClass("bi-heart")
                     } else {
-                        console.warn(data["message"])
+                        alert(data["message"])
                     }
                 } catch (error) {
                     console.log(error)
@@ -1042,7 +1033,7 @@ function ClickModalFav() {
                         $('#span_fav').removeClass("bi-heart bi-heart-fill fav")
                         $('#span_fav').addClass("bi-heart-fill fav")
                     } else {
-                        console.warn(data["message"])
+                        alert(data["message"])
                     }
                 } catch (error) {
                     console.log(error)
@@ -1059,7 +1050,7 @@ function ClickModalFav() {
                         $('#span_fav').removeClass("bi-heart bi-heart-fill fav")
                         $('#span_fav').addClass("bi-heart")
                     } else {
-                        console.warn(data["message"])
+                        alert(data["message"])
                     }
                 } catch (error) {
                     console.log(error)
@@ -1104,6 +1095,7 @@ function GetInfoFromLocalStorage() {
         steps = localStorage.getItem("steps");
         n_samples = localStorage.getItem("n_samples");
         sampler = localStorage.getItem("sampler");
+        model_id = localStorage.getItem("model_id");
     }
 }
 
