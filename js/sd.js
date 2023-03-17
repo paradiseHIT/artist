@@ -21,7 +21,7 @@ var height = undefined
 var guidance_scale = 7.5
 var random_seed = undefined
 var sampler = "ddim"
-var model_id = "default_model"
+var model_id = "runwayml/stable-diffusion-v1-5"
 var n_samples = undefined
 var job_not_exists = false
 var job_internal_error = false
@@ -227,7 +227,7 @@ function Init() {
     guidance_scale = 7.5
     random_seed = undefined
     sampler = "ddim"
-    model_id = "default_model"
+    model_id = "runwayml/stable-diffusion-v1-5"
     n_samples = undefined
     job_not_exists = false
     job_internal_error = false
@@ -275,7 +275,7 @@ function GenerateInitilize() {
     }
     //for model id
     if ($("input:radio:checked").val() == undefined) {
-        $('input:radio[value=default_model]').attr('checked', 'true');
+        $('input:radio[value=runwayml/stable-diffusion-v1-5]').attr('checked', 'true');
     }
 }
 
