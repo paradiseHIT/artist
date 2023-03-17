@@ -305,7 +305,6 @@ function DisplayJobNotExists(job_id) {
 
     q_text = "<p>Job:<red>" + job_id + "</red> not exists</p>"
     queue_div.append($(q_text))
-    $(".container").append(queue_div)
 }
 function DisplayError() {
     var queue_div = $("<div></div>")
@@ -313,7 +312,6 @@ function DisplayError() {
 
     q_text = "<p>Internal Error</p>"
     queue_div.append($(q_text))
-    $(".container").append(queue_div)
 }
 
 function DisplayInProgress(n) {
@@ -324,14 +322,12 @@ function DisplayInProgress(n) {
         tmp += "."
     }
     queue_div.append($("<p>current request is processing" + tmp + "</p>"))
-    $(".container").append(queue_div)
 }
 
 function DisplayQueue(n) {
     var queue_div = $("#queue_div")
     queue_div.empty()
     queue_div.append($("<p>current request is order <red>" + n + "</red></p>"))
-    $(".container").append(queue_div)
 }
 
 function DisplayPrompt(p_str) {
