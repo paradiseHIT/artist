@@ -562,18 +562,38 @@ function QueryOnce(job_id, is_show, is_append) {
 
 function Generate() {
     var job_id
+    width = $("#width").val()
+    height = $("#height").val()
+    random_seed = $("#random_seed").val()
+    negative_prompt = $("#negative_prompt").val()
+    prompt_str = $("#prompt").val()
+    guidance_scale = $("#guidance_scale").val()
+    steps = $("#steps").val()
+    n_samples = $("#n_samples").val()
+    sampler = $("#sampler").val()
+    model_id = $("input:radio:checked").val()
     var post_data = {
-        "width": $("#width").val(),
-        "height": $("#height").val(),
-        "random_seed": $("#random_seed").val(),
-        "negative_prompt": $("#negative_prompt").val(),
-        "prompt": $("#prompt").val(),
-        "guidance_scale": $("#guidance_scale").val(),
-        "steps": $("#steps").val(),
-        "n_samples": $("#n_samples").val(),
-        "sampler": $("#sampler").val(),
-        "model_id": $("input:radio:checked").val()
+        "width": width,
+        "height": height,
+        "random_seed": random_seed,
+        "negative_prompt": negative_prompt,
+        "prompt": prompt_str,
+        "guidance_scale": guidance_scale,
+        "steps": steps,
+        "n_samples": n_samples,
+        "sampler": sampler,
+        "model_id": model_id
     }
+    localStorage.setItem("width", width);
+    localStorage.setItem("height", height);
+    localStorage.setItem("random_seed", random_seed);
+    localStorage.setItem("negative_prompt", negative_prompt);
+    localStorage.setItem("prompt", prompt_str);
+    localStorage.setItem("guidance_scale", guidance_scale);
+    localStorage.setItem("steps", steps);
+    localStorage.setItem("n_samples", n_samples);
+    localStorage.setItem("sampler", sampler);
+    localStorage.setItem("model_id", model_id);
     $.post("/generate", post_data, function (mydata) {
         try {
             var request_id = mydata["request_id"]
