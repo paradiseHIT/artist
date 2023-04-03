@@ -21,7 +21,7 @@ var height = undefined
 var guidance_scale = 7.5
 var random_seed = undefined
 var sampler = "ddim"
-var model_id = "runwayml/stable-diffusion-v1-5"
+var model_id = "default_model"
 var n_samples = undefined
 var job_not_exists = false
 var job_internal_error = false
@@ -233,7 +233,7 @@ function Init() {
     guidance_scale = 7.5
     random_seed = undefined
     sampler = "ddim"
-    model_id = "runwayml/stable-diffusion-v1-5"
+    model_id = "default_model"
     n_samples = undefined
     job_not_exists = false
     job_internal_error = false
