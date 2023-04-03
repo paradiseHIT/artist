@@ -281,7 +281,7 @@ function GenerateInitilize() {
     }
     //for model id
     if ($("input:radio:checked").val() == undefined) {
-        $('input:radio[value=runwayml/stable-diffusion-v1-5]').attr('checked', 'true');
+        $('input:radio[value=default_model]').attr('checked', 'true');
     }
 }
 
